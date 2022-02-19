@@ -5,6 +5,8 @@ VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Facilis.UsersManagement", "Facilis.UsersManagement\Facilis.UsersManagement.csproj", "{3294EEB1-8350-4D70-ABD9-06A11AE6D3C9}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Facilis.Core", "..\..\Facilis.Core\Facilis.Core\Facilis.Core\Facilis.Core.csproj", "{DECC13BC-DD92-48F9-BD07-41E4AF6EF63F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{3294EEB1-8350-4D70-ABD9-06A11AE6D3C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3294EEB1-8350-4D70-ABD9-06A11AE6D3C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3294EEB1-8350-4D70-ABD9-06A11AE6D3C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DECC13BC-DD92-48F9-BD07-41E4AF6EF63F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DECC13BC-DD92-48F9-BD07-41E4AF6EF63F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DECC13BC-DD92-48F9-BD07-41E4AF6EF63F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DECC13BC-DD92-48F9-BD07-41E4AF6EF63F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
