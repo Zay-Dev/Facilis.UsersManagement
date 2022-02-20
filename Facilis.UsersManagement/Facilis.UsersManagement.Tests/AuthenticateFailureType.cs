@@ -7,7 +7,6 @@ using Facilis.UsersManagement.Tests.Helpers;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
-using System.Linq;
 
 namespace Facilis.UsersManagement.Tests
 {
