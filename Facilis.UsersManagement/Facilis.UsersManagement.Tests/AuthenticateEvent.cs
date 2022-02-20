@@ -14,26 +14,18 @@ namespace Facilis.UsersManagement.Tests
         public const string USERNAME = nameof(USERNAME);
         public const string PASSWORD = nameof(PASSWORD);
 
-        private IPasswordHasher passwordHasher { get; } = new BCryptNetPasswordHasher();
-
-        private DbContext context { get; set; }
-        private IEntities<User> users { get; set; }
-        private IAuthenticator authenticator { get; set; }
+        private Instances instances { get; set; }
 
         [SetUp]
         public void Setup()
         {
-            this.context = nameof(Facilis).InMemoryContext<AppDbContext>();
-
-            this.users = new Entities<User>(this.context);
-            this.authenticator = new Authenticator<User>(this.users, this.passwordHasher);
+            this.instances = new Instances(new BCryptNetPasswordHasher());
         }
 
         [TearDown]
         public void TearDown()
         {
-            this.context.Database.EnsureDeleted();
-            this.users.Dispose();
+            this.instances.Dispose();
         }
 
         [Test]
@@ -41,16 +33,20 @@ namespace Facilis.UsersManagement.Tests
         {
             // Arrange
             var triggered = false;
-            var user = this.passwordHasher.CreateUser(USERNAME, PASSWORD);
-            this.users.Add(user);
+            var user = this.instances
+                .PasswordHasher
+                .CreateUser(USERNAME, PASSWORD);
+
+            this.instances.Users.Add(user);
 
             // Act
-            this.authenticator.Authenticated += (_, user) =>
+            this.instances.Authenticator.Authenticated += (_, user) =>
             {
                 Console.WriteLine(user.Id);
                 triggered = true;
             };
-            this.authenticator
+            this.instances
+                .Authenticator
                 .TryAuthenticate(USERNAME, PASSWORD, out var _);
 
             // Assert
@@ -65,12 +61,15 @@ namespace Facilis.UsersManagement.Tests
             var failureType = LoginFailureTypes.None;
 
             // Act
-            this.authenticator.AuthenticateFailed += (_, type, username, password) =>
-            {
-                Console.WriteLine($"{username} | {password}");
-                failureType = type;
-            };
-            this.authenticator
+            this.instances
+                .Authenticator
+                .AuthenticateFailed += (_, type, username, password) =>
+                {
+                    Console.WriteLine($"{username} | {password}");
+                    failureType = type;
+                };
+            this.instances
+                .Authenticator
                 .TryAuthenticate(USERNAME, PASSWORD, out var _);
 
             // Assert

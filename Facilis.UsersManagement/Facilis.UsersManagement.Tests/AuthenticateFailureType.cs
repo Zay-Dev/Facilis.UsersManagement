@@ -1,10 +1,6 @@
-using Facilis.Core.Abstractions;
-using Facilis.Core.EntityFrameworkCore;
 using Facilis.Core.Enums;
-using Facilis.UsersManagement.Abstractions;
 using Facilis.UsersManagement.Enums;
 using Facilis.UsersManagement.Tests.Helpers;
-using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
 
@@ -15,37 +11,33 @@ namespace Facilis.UsersManagement.Tests
         public const string USERNAME = nameof(USERNAME);
         public const string PASSWORD = nameof(PASSWORD);
 
-        private IPasswordHasher passwordHasher { get; } = new BCryptNetPasswordHasher();
-
-        private DbContext context { get; set; }
-        private IEntities<User> users { get; set; }
-        private IAuthenticator authenticator { get; set; }
+        private Instances instances { get; set; }
 
         [SetUp]
         public void Setup()
         {
-            this.context = nameof(Facilis).InMemoryContext<AppDbContext>();
-
-            this.users = new Entities<User>(this.context);
-            this.authenticator = new Authenticator<User>(this.users, this.passwordHasher);
+            this.instances = new Instances(new BCryptNetPasswordHasher());
         }
 
         [TearDown]
         public void TearDown()
         {
-            this.context.Database.EnsureDeleted();
-            this.users.Dispose();
+            this.instances.Dispose();
         }
 
         [Test]
         public void TestTryAuthenticate_FailureTypeNone()
         {
             // Arrange
-            var user = this.passwordHasher.CreateUser(USERNAME, PASSWORD);
-            this.users.Add(user);
+            var user = this.instances
+                .PasswordHasher
+                .CreateUser(USERNAME, PASSWORD);
+
+            this.instances.Users.Add(user);
 
             // Act
-            var failureType = this.authenticator
+            var failureType = this.instances
+                .Authenticator
                 .TryAuthenticate(USERNAME, PASSWORD, out var _);
 
             // Assert
@@ -59,7 +51,8 @@ namespace Facilis.UsersManagement.Tests
             // Arrange
 
             // Act
-            var failureType = this.authenticator
+            var failureType = this.instances
+                .Authenticator
                 .TryAuthenticate(USERNAME, PASSWORD, out var _);
 
             // Assert
@@ -71,12 +64,16 @@ namespace Facilis.UsersManagement.Tests
         public void TestTryAuthenticate_FailureTypeDisabledUser()
         {
             // Arrange
-            var user = this.passwordHasher.CreateUser(USERNAME, PASSWORD);
+            var user = this.instances
+                .PasswordHasher
+                .CreateUser(USERNAME, PASSWORD);
+
             user.Status = StatusTypes.Disabled;
-            this.users.Add(user);
+            this.instances.Users.Add(user);
 
             // Act
-            var failureType = this.authenticator
+            var failureType = this.instances
+                .Authenticator
                 .TryAuthenticate(USERNAME, PASSWORD, out var _);
 
             // Assert
@@ -88,12 +85,16 @@ namespace Facilis.UsersManagement.Tests
         public void TestTryAuthenticate_FailureTypeLockedUser()
         {
             // Arrange
-            var user = this.passwordHasher.CreateUser(USERNAME, PASSWORD);
+            var user = this.instances
+                .PasswordHasher
+                .CreateUser(USERNAME, PASSWORD);
+
             user.LockedUntilUtc = DateTime.UtcNow.AddMinutes(1);
-            this.users.Add(user);
+            this.instances.Users.Add(user);
 
             // Act
-            var failureType = this.authenticator
+            var failureType = this.instances
+                .Authenticator
                 .TryAuthenticate(USERNAME, PASSWORD, out var _);
 
             // Assert
@@ -105,11 +106,14 @@ namespace Facilis.UsersManagement.Tests
         public void TestTryAuthenticate_FailureTypePasswordMismatch()
         {
             // Arrange
-            var user = this.passwordHasher.CreateUser(USERNAME, PASSWORD);
-            this.users.Add(user);
+            var user = this.instances
+                .PasswordHasher
+                .CreateUser(USERNAME, PASSWORD);
+            this.instances.Users.Add(user);
 
             // Act
-            var failureType = this.authenticator
+            var failureType = this.instances
+                .Authenticator
                 .TryAuthenticate(USERNAME, "", out var _);
 
             // Assert
