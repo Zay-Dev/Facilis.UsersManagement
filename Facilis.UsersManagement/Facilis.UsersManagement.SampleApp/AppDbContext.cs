@@ -14,5 +14,11 @@ namespace Facilis.UsersManagement.SampleApp
         }
 
         #endregion Constructor(s)
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<User>().HasIndex(user => user.Username).IsUnique();
+            base.OnModelCreating(builder);
+        }
     }
 }
