@@ -7,9 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Facilis.UsersManagement", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Facilis.Core", "..\..\Facilis.Core\Facilis.Core\Facilis.Core\Facilis.Core.csproj", "{DECC13BC-DD92-48F9-BD07-41E4AF6EF63F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Facilis.UsersManagement.Tests", "Facilis.UsersManagement.Tests\Facilis.UsersManagement.Tests.csproj", "{2B97840E-95AF-498C-A9C0-1F65B51448D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Facilis.UsersManagement.Tests", "Facilis.UsersManagement.Tests\Facilis.UsersManagement.Tests.csproj", "{2B97840E-95AF-498C-A9C0-1F65B51448D3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Facilis.Core.EntityFrameworkCore", "..\..\Facilis.Core\Facilis.Core\Facilis.Core.EntityFrameworkCore\Facilis.Core.EntityFrameworkCore.csproj", "{E3E65CC6-FA59-4D6B-906D-A23752A4F284}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Facilis.UsersManagement.SampleApp", "Facilis.UsersManagement.SampleApp\Facilis.UsersManagement.SampleApp.csproj", "{539E3B30-ECF0-4540-96B3-B1533ECBEB66}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{E3E65CC6-FA59-4D6B-906D-A23752A4F284}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E3E65CC6-FA59-4D6B-906D-A23752A4F284}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E3E65CC6-FA59-4D6B-906D-A23752A4F284}.Release|Any CPU.Build.0 = Release|Any CPU
+		{539E3B30-ECF0-4540-96B3-B1533ECBEB66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{539E3B30-ECF0-4540-96B3-B1533ECBEB66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{539E3B30-ECF0-4540-96B3-B1533ECBEB66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{539E3B30-ECF0-4540-96B3-B1533ECBEB66}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
