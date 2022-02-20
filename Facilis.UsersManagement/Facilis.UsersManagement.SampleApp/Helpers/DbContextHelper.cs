@@ -6,6 +6,7 @@ namespace Facilis.UsersManagement.SampleApp.Helpers
 {
     public static class DbContextHelper
     {
+        public const string USERNAME = nameof(USERNAME);
         public const string PASSWORD = "password";
 
         public static void SeedData(this IServiceProvider provider)
@@ -17,7 +18,7 @@ namespace Facilis.UsersManagement.SampleApp.Helpers
 
             provider.GetService<DbContext>().Database.EnsureCreated();
             entities.CreateUserIfNotExists(
-                nameof(User.Username),
+                USERNAME,
                 password,
                 operators.GetSystemOperatorName()
             );
