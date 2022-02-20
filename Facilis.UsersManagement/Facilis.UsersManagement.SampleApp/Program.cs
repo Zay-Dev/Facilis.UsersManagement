@@ -4,11 +4,21 @@ using Facilis.UsersManagement;
 using Facilis.UsersManagement.Abstractions;
 using Facilis.UsersManagement.SampleApp;
 using Facilis.UsersManagement.SampleApp.Helpers;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 static void ConfigureService(WebApplicationBuilder builder)
 {
     builder.Services.AddControllersWithViews();
+    builder.Services
+        .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        .AddCookie(options =>
+        {
+            options.LoginPath = "/sign-in";
+            options.ExpireTimeSpan = TimeSpan.FromHours(1);
+            options.SlidingExpiration = true;
+        });
+
     builder.Services
         .AddHttpContextAccessor()
         .AddSingleton<IPasswordHasher, BCryptNetPasswordHasher>()
@@ -48,6 +58,7 @@ static void Configure(WebApplication app)
 
     app.UseRouting();
 
+    app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapControllerRoute(
