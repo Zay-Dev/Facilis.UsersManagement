@@ -6,10 +6,14 @@ using System.Linq;
 
 namespace Facilis.UsersManagement.Abstractions
 {
+    public delegate void AuthenticatedEventHandler(object sender, IUser user);
+
     public delegate void AuthenticateFailedEventHandler(object sender, LoginFailureTypes type, string username, string password);
 
     public interface IAuthenticator
     {
+        event AuthenticatedEventHandler Authenticated;
+
         event AuthenticateFailedEventHandler AuthenticateFailed;
 
         LoginFailureTypes TryAuthenticate(string username, string password, out IUser user);
@@ -19,6 +23,8 @@ namespace Facilis.UsersManagement.Abstractions
     {
         private IEntities<T> entities { get; }
         private IPasswordHasher passwordHasher { get; }
+
+        public event AuthenticatedEventHandler Authenticated;
 
         public event AuthenticateFailedEventHandler AuthenticateFailed;
 
@@ -58,15 +64,17 @@ namespace Facilis.UsersManagement.Abstractions
             {
                 this.OnAuthenticateFailed(failureType, username, password);
             }
+            else
+            {
+                this.OnAuthenticated(user);
+            }
 
             return failureType;
         }
 
-        private IUser FindByUsername(string username)
+        protected virtual void OnAuthenticated(IUser user)
         {
-            return this.entities.Rows.FirstOrDefault(entity =>
-                entity.Username.ToLower() == username.ToLower()
-            );
+            this.Authenticated?.Invoke(this, user);
         }
 
         protected virtual void OnAuthenticateFailed(
@@ -76,6 +84,13 @@ namespace Facilis.UsersManagement.Abstractions
         )
         {
             this.AuthenticateFailed?.Invoke(this, type, username, password);
+        }
+
+        private IUser FindByUsername(string username)
+        {
+            return this.entities.Rows.FirstOrDefault(entity =>
+                entity.Username.ToLower() == username.ToLower()
+            );
         }
 
         private static bool IsLocked(IUser user)
