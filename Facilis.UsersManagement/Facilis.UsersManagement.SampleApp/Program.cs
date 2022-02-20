@@ -1,12 +1,28 @@
 using Facilis.Core.Abstractions;
 using Facilis.Core.EntityFrameworkCore;
+using Facilis.UsersManagement;
+using Facilis.UsersManagement.Abstractions;
 using Facilis.UsersManagement.SampleApp;
+using Facilis.UsersManagement.SampleApp.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 static void ConfigureService(WebApplicationBuilder builder)
 {
     builder.Services.AddControllersWithViews();
     builder.Services
+        .AddHttpContextAccessor()
+        .AddSingleton<IPasswordHasher, BCryptNetPasswordHasher>()
+        .AddScoped<IAuthenticator, Authenticator<User>>()
+        .AddScoped<IOperators>(provider => new Operators()
+        {
+            SystemOperatorName = nameof(System),
+            CurrentOperatorName = provider.GetService<IHttpContextAccessor>()
+                .HttpContext?
+                .User?
+                .Identity?
+                .Name,
+        })
+
         .AddDbContext<AppDbContext>(option =>
             option.UseSqlite("Data Source=./local.db;")
         )
@@ -25,10 +41,7 @@ static void Configure(WebApplication app)
     }
 
     using var scope = app.Services.CreateScope();
-    scope.ServiceProvider
-        .GetService<DbContext>()
-        .Database
-        .EnsureCreated();
+    scope.ServiceProvider.SeedData();
 
     app.UseHttpsRedirection();
     app.UseStaticFiles();
