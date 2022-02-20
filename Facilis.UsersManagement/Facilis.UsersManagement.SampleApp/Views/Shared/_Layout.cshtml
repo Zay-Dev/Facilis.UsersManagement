@@ -4,8 +4,19 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Facilis.UsersManagement - SampleApp</title>
+
+    <partial name="_Styles" />
+    <partial name="_Scripts" />
 </head>
-<body>
-    @RenderBody()
+
+<body x-data="{isLoading: false}">
+    <div>
+        @RenderBody()
+    </div>
+
+    <div class="css-loader-wrapper"
+         x-show="isLoading">
+        <div class="lds-dual-ring"></div>
+    </div>
 </body>
 </html>
