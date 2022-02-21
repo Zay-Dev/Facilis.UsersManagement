@@ -1,9 +1,5 @@
-﻿using Facilis.Core.Abstractions;
-using Facilis.Core.EntityFrameworkCore;
-using Facilis.UsersManagement.Abstractions;
-using Facilis.UsersManagement.Enums;
+﻿using Facilis.UsersManagement.Enums;
 using Facilis.UsersManagement.Tests.Helpers;
-using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
 
