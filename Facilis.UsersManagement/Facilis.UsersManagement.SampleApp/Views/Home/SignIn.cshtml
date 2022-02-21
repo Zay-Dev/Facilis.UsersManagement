@@ -1,0 +1,62 @@
+﻿@using Facilis.UsersManagement.SampleApp.Helpers
+
+<div class="vh-100 d-flex align-items-center justify-content-center">
+    <div class="card p-4">
+        <div class="mb-3">
+            <h1 class="fs-3">Facilis Users Management</h1>
+            <h2 class="fs-5">Sample App</h2>
+        </div>
+
+        <form method="post">
+            <div class="mb-3">
+                <div class="form-group mb-2">
+                    <label for="username">Username</label>
+                    <input id="username" required
+                           name="username"
+                           placeholder="Username"
+                           class="form-control"
+                           value="@TempData["Username"]" />
+                </div>
+
+                <div class="form-group mb-2">
+                    <label for="password">Password</label>
+                    <input id="password" required
+                           name="password"
+                           placeholder="Password"
+                           class="form-control"
+                           type="password" />
+                </div>
+            </div>
+
+            <hr />
+
+            <div>
+                <div>
+                    Username:
+                    <code>@DbContextHelper.USERNAME.ToLower()</code>
+                </div>
+
+                <div>
+                    Password:
+                    <code>@DbContextHelper.PASSWORD</code>
+                </div>
+            </div>
+
+            <hr />
+
+            @if (((bool?)TempData["IsRetry"]) == true)
+            {
+                <div class="mb-3">
+                    <span class="text-danger">
+                        Incorrect username or password
+                        (@DateTime.UtcNow.ToString("HH:mm:ss"))
+                    </span>
+                </div>
+            }
+
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary">Login</button>
+            </div>
+        </form>
+    </div>
+</div>

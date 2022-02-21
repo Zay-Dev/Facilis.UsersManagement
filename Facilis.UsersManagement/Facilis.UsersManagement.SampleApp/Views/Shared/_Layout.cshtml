@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Facilis.UsersManagement - SampleApp</title>
+
+    <partial name="_Styles" />
+    <partial name="_Scripts" />
+</head>
+
+<body x-data="{isLoading: false}">
+    @if (this.Context.User.Identity?.IsAuthenticated == true)
+    {
+        <div class="position-fixed top-0 start-0 w-100">
+            <div class="p-3">
+                <div class="card p-2">
+                    <div class="d-flex justify-content-end">
+                        <a href="~/sign-out" class="btn btn-danger">
+                            Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div>
+        @RenderBody()
+    </div>
+
+    <div class="css-loader-wrapper"
+         x-show="isLoading">
+        <div class="lds-dual-ring"></div>
+    </div>
+</body>
+</html>
