@@ -20,14 +20,22 @@ namespace Facilis.UsersManagement.Abstractions
 
     public class User<TProfile> : IUser
     {
+        private string serializedProfile;
+
         public string Username { get; set; }
         public DateTime? LockedUntilUtc { get; set; }
 
         [NotMapped]
-        public object Profile { get; set; }
+        public object Profile => this.GetProfile<TProfile>();
 
         public string Id { get; set; } = Guid.NewGuid().ToString();
-        public string SerializedProfile { get; set; }
+
+        public string SerializedProfile
+        {
+            get => this.serializedProfile;
+            set { this.serializedProfile = value; }
+        }
+
         public StatusTypes Status { get; set; }
 
         public string CreatedBy { get; set; }
@@ -41,24 +49,14 @@ namespace Facilis.UsersManagement.Abstractions
         public string PasswordSalt { get; set; }
         public int PasswordIterated { get; set; }
 
-        #region Constructor(s)
-
-        public User()
-        {
-            this.Profile = this.GetProfile<TProfile>();
-        }
-
-        #endregion Constructor(s)
-
         public T GetProfile<T>()
         {
-            return this.SerializedProfile == null ? default :
-                JsonSerializer.Deserialize<T>(this.SerializedProfile);
+            return this.serializedProfile == null ? default :
+                JsonSerializer.Deserialize<T>(this.serializedProfile);
         }
 
         public void SetProfile(object profile)
         {
-            this.Profile = profile;
             this.SerializedProfile = JsonSerializer.Serialize(profile);
         }
     }
