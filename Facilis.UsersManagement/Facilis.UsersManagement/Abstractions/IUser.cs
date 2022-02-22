@@ -1,6 +1,5 @@
 ﻿using Facilis.Core.Abstractions;
 using Facilis.Core.Enums;
-using Facilis.UsersManagement.Entities;
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
@@ -53,7 +52,8 @@ namespace Facilis.UsersManagement.Abstractions
 
         public T GetProfile<T>()
         {
-            return JsonSerializer.Deserialize<T>(this.SerializedProfile);
+            return this.SerializedProfile == null ? default :
+                JsonSerializer.Deserialize<T>(this.SerializedProfile);
         }
 
         public void SetProfile(object profile)
