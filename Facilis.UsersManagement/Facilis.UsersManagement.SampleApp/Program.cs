@@ -2,6 +2,7 @@ using Facilis.Core.Abstractions;
 using Facilis.Core.EntityFrameworkCore;
 using Facilis.UsersManagement;
 using Facilis.UsersManagement.Abstractions;
+using Facilis.UsersManagement.Models;
 using Facilis.UsersManagement.SampleApp;
 using Facilis.UsersManagement.SampleApp.Helpers;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -22,7 +23,7 @@ static void ConfigureService(WebApplicationBuilder builder)
     builder.Services
         .AddHttpContextAccessor()
         .AddSingleton<IPasswordHasher, BCryptNetPasswordHasher>()
-        .AddScoped<IAuthenticator, Authenticator<User>>()
+        .AddScoped<IAuthenticator, Authenticator<User<UserProfile>>>()
         .AddScoped<IOperators>(provider => new Operators()
         {
             SystemOperatorName = nameof(System),
