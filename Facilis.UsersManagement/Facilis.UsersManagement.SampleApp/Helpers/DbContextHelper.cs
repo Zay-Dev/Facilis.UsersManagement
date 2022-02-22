@@ -8,6 +8,7 @@ namespace Facilis.UsersManagement.SampleApp.Helpers
 {
     public static class DbContextHelper
     {
+        public const string ADMIN = nameof(ADMIN);
         public const string USERNAME = nameof(USERNAME);
         public const string PASSWORD = "password";
 
@@ -19,10 +20,18 @@ namespace Facilis.UsersManagement.SampleApp.Helpers
             var password = provider.GetService<IPasswordHasher>().Hash(PASSWORD);
 
             provider.GetService<DbContext>().Database.EnsureCreated();
+
             entities.CreateUserIfNotExists(
                 USERNAME,
                 password,
                 new[] { RoleTypes.User },
+                operators.GetSystemOperatorName()
+            );
+
+            entities.CreateUserIfNotExists(
+                ADMIN,
+                password,
+                new[] { RoleTypes.Administrator, RoleTypes.User },
                 operators.GetSystemOperatorName()
             );
         }
@@ -57,7 +66,7 @@ namespace Facilis.UsersManagement.SampleApp.Helpers
                 LastSignInAtUtc = DateTime.UtcNow,
             });
 
-            entities.Add();
+            entities.Add(user);
         }
     }
 }
