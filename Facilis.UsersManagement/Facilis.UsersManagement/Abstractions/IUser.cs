@@ -1,6 +1,8 @@
 ﻿using Facilis.Core.Abstractions;
 using Facilis.Core.Enums;
+using Facilis.UsersManagement.Entities;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 
 namespace Facilis.UsersManagement.Abstractions
@@ -14,15 +16,16 @@ namespace Facilis.UsersManagement.Abstractions
         IPassword
     {
         string Username { get; }
-        string Nickname { get; }
         DateTime? LockedUntilUtc { get; }
     }
 
-    public class User : IUser
+    public class User<TProfile> : IUser
     {
         public string Username { get; set; }
-        public string Nickname { get; set; }
         public DateTime? LockedUntilUtc { get; set; }
+
+        [NotMapped]
+        public object Profile { get; set; }
 
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public string SerializedProfile { get; set; }
@@ -39,13 +42,23 @@ namespace Facilis.UsersManagement.Abstractions
         public string PasswordSalt { get; set; }
         public int PasswordIterated { get; set; }
 
-        public T GetProfile<T>() where T : class, new()
+        #region Constructor(s)
+
+        public User()
+        {
+            this.Profile = this.GetProfile<TProfile>();
+        }
+
+        #endregion Constructor(s)
+
+        public T GetProfile<T>()
         {
             return JsonSerializer.Deserialize<T>(this.SerializedProfile);
         }
 
         public void SetProfile(object profile)
         {
+            this.Profile = profile;
             this.SerializedProfile = JsonSerializer.Serialize(profile);
         }
     }
