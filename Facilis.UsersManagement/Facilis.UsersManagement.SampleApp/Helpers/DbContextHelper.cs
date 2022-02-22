@@ -1,6 +1,7 @@
 ﻿using Facilis.Core.Abstractions;
 using Facilis.UsersManagement.Abstractions;
 using Facilis.UsersManagement.Models;
+using Facilis.UsersManagement.SampleApp.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Facilis.UsersManagement.SampleApp.Helpers
@@ -21,6 +22,7 @@ namespace Facilis.UsersManagement.SampleApp.Helpers
             entities.CreateUserIfNotExists(
                 USERNAME,
                 password,
+                new[] { RoleTypes.User },
                 operators.GetSystemOperatorName()
             );
         }
@@ -29,6 +31,7 @@ namespace Facilis.UsersManagement.SampleApp.Helpers
             this IEntities<User<UserProfile>> entities,
             string username,
             IPassword password,
+            RoleTypes[] roles,
             string @operator
         )
         {
@@ -37,7 +40,7 @@ namespace Facilis.UsersManagement.SampleApp.Helpers
                 .Any(x => x.Username.ToLower() == username.ToLower());
             if (exists) return;
 
-            entities.Add(new User<UserProfile>()
+            var user = new User<UserProfile>()
             {
                 Username = username,
                 CreatedBy = @operator,
@@ -47,7 +50,14 @@ namespace Facilis.UsersManagement.SampleApp.Helpers
                 HashedPassword = password.HashedPassword,
                 PasswordSalt = password.PasswordSalt,
                 PasswordIterated = password.PasswordIterated,
+            };
+            user.SetProfile(new UserProfile()
+            {
+                Roles = roles.Select(x => x.ToString()).ToArray(),
+                LastSignInAtUtc = DateTime.UtcNow,
             });
+
+            entities.Add();
         }
     }
 }
