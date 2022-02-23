@@ -1,4 +1,5 @@
-﻿using Facilis.UsersManagement.Abstractions;
+﻿using Facilis.Core.Abstractions;
+using Facilis.UsersManagement.Abstractions;
 using Facilis.UsersManagement.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,7 @@ namespace Facilis.UsersManagement.SampleApp
     public class AppDbContext : DbContext
     {
         public DbSet<User<UserProfile>> Users { get; set; }
+        public DbSet<ExtendedAttribute> ExtendedAttributes { get; set; }
 
         #region Constructor(s)
 

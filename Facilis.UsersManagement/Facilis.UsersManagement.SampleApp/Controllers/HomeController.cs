@@ -1,4 +1,5 @@
-﻿using Facilis.UsersManagement.Abstractions;
+﻿using Facilis.Core.Abstractions;
+using Facilis.UsersManagement.Abstractions;
 using Facilis.UsersManagement.Enums;
 using Facilis.UsersManagement.Models;
 using Microsoft.AspNetCore.Authentication;
@@ -13,12 +14,17 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
     public class HomeController : Controller
     {
         private IAuthenticator authenticator { get; }
+        private IEntities<User<UserProfile>> users { get; }
 
         #region Constructor(s)
 
-        public HomeController(IAuthenticator authenticator)
+        public HomeController(
+            IAuthenticator authenticator,
+            IEntities<User<UserProfile>> users
+        )
         {
             this.authenticator = authenticator;
+            this.users = users;
         }
 
         #endregion Constructor(s)
@@ -64,6 +70,11 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
             );
 
             await this.HttpContext.SignInAsync(new ClaimsPrincipal(identity));
+
+            profile.LastSignInAtUtc = DateTime.UtcNow;
+            user.SetProfile(profile);
+            this.users.Update((User<UserProfile>)user);
+
             return Redirect("~/");
         }
 
