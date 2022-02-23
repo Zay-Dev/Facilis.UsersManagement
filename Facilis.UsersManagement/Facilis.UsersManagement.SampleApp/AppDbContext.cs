@@ -1,11 +1,14 @@
-﻿using Facilis.UsersManagement.Abstractions;
+﻿using Facilis.Core.Abstractions;
+using Facilis.UsersManagement.Abstractions;
+using Facilis.UsersManagement.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Facilis.UsersManagement.SampleApp
 {
     public class AppDbContext : DbContext
     {
-        public DbSet<User> Users { get; set; }
+        public DbSet<User<UserProfile>> Users { get; set; }
+        public DbSet<ExtendedAttribute> ExtendedAttributes { get; set; }
 
         #region Constructor(s)
 
@@ -17,7 +20,9 @@ namespace Facilis.UsersManagement.SampleApp
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<User>().HasIndex(user => user.Username).IsUnique();
+            builder.Entity<User<UserProfile>>()
+                .HasIndex(user => user.Username)
+                .IsUnique();
             base.OnModelCreating(builder);
         }
     }

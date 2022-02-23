@@ -1,7 +1,9 @@
 using Facilis.Core.Abstractions;
 using Facilis.Core.EntityFrameworkCore;
+using Facilis.Core.EntityFrameworkCore.Abstractions;
 using Facilis.UsersManagement;
 using Facilis.UsersManagement.Abstractions;
+using Facilis.UsersManagement.Models;
 using Facilis.UsersManagement.SampleApp;
 using Facilis.UsersManagement.SampleApp.Helpers;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -22,7 +24,8 @@ static void ConfigureService(WebApplicationBuilder builder)
     builder.Services
         .AddHttpContextAccessor()
         .AddSingleton<IPasswordHasher, BCryptNetPasswordHasher>()
-        .AddScoped<IAuthenticator, Authenticator<User>>()
+        .AddScoped<IAuthenticator, Authenticator<User<UserProfile>>>()
+
         .AddScoped<IOperators>(provider => new Operators()
         {
             SystemOperatorName = nameof(System),
@@ -36,8 +39,21 @@ static void ConfigureService(WebApplicationBuilder builder)
         .AddDbContext<AppDbContext>(option =>
             option.UseSqlite("Data Source=./local.db;")
         )
-        .AddDbContext<DbContext, AppDbContext>()
-        .AddScoped(typeof(IEntities<>), typeof(Entities<>));
+        .AddScoped<DbContext>(provider =>
+        {
+            var binder = provider.GetService<IProfileAttributesBinder>();
+            var context = provider.GetService<AppDbContext>();
+
+            context.SavingChanges += binder.DbContextSavingChanges;
+            context.SavedChanges += binder.DbContextSavedChanges;
+
+            return context;
+        })
+
+        .AddScoped(typeof(IEntities<>), typeof(Entities<>))
+        .AddScoped(typeof(IScopedEntities<>), typeof(ScopedEntities<>))
+
+        .AddScoped<IProfileAttributesBinder, ProfileAttributesBinder>();
 }
 
 static void Configure(WebApplication app)
