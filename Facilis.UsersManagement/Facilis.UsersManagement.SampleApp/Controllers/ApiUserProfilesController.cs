@@ -23,10 +23,29 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
 
         #endregion Constructor(s)
 
+        [Route("~/api/user-profiles")]
+        public IActionResult ListUsers()
+        {
+            if (!this.IsMeAdmin()) return Unauthorized();
+
+            return new JsonResult(this.users
+                .WhereEnabled()
+                .Select(user => new { user, profile = user.Profile as UserProfile })
+                .Select(entity => new
+                {
+                    entity.user.Id,
+                    entity.profile.Email,
+                    entity.profile.Nickname,
+                    entity.profile.FirstName,
+                    entity.profile.LastName,
+                })
+            );
+        }
+
         [HttpPatch]
         public IActionResult Index(string userId, [FromBody] UserProfile model)
         {
-            var isAdmin = this.User.IsInRole(nameof(RoleTypes.Administrator));
+            var isAdmin = this.IsMeAdmin();
             var user = this.users.FindById(this.User
                 .Claims
                 .First(claim => claim.Type == ClaimTypes.NameIdentifier)
@@ -35,11 +54,10 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
 
             if (user == null) return NotFound();
             if (!isAdmin && userId != user.Id) return BadRequest();
-
-            var profile = this.users
-                .FindById(userId)
-                ?.Profile as UserProfile;
-            if (profile == null) return NotFound();
+            if (this.users.FindById(userId)?.Profile is not UserProfile profile)
+            {
+                return NotFound();
+            }
 
             if (isAdmin) profile.Email = model.Email;
             profile.Nickname = model.Nickname;
@@ -49,6 +67,11 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
             user.SetProfile(profile);
             this.users.Update(user);
             return Ok();
+        }
+
+        private bool IsMeAdmin()
+        {
+            return this.User.IsInRole(nameof(RoleTypes.Administrator));
         }
     }
 }
