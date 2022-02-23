@@ -31,7 +31,12 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            var userId = this.User
+                .Claims
+                .First(claim => claim.Type == ClaimTypes.NameIdentifier)
+                .Value;
+
+            return View(this.users.FindById(userId));
         }
 
         [AllowAnonymous]
