@@ -34,6 +34,7 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
                 .Select(entity => new
                 {
                     entity.user.Id,
+                    entity.user.Username,
                     entity.profile.Email,
                     entity.profile.Nickname,
                     entity.profile.FirstName,
