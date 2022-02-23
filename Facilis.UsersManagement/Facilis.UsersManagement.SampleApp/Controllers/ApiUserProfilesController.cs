@@ -47,15 +47,15 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
         public IActionResult Index(string userId, [FromBody] UserProfile model)
         {
             var isAdmin = this.IsMeAdmin();
-            var user = this.users.FindById(this.User
+            var myUserId = this.User
                 .Claims
                 .First(claim => claim.Type == ClaimTypes.NameIdentifier)
-                .Value
-            );
+                .Value;
 
-            if (user == null) return NotFound();
-            if (!isAdmin && userId != user.Id) return BadRequest();
-            if (this.users.FindById(userId)?.Profile is not UserProfile profile)
+            if (!isAdmin && userId != myUserId) return BadRequest();
+
+            var user = this.users.FindById(userId);
+            if (user?.Profile is not UserProfile profile)
             {
                 return NotFound();
             }
