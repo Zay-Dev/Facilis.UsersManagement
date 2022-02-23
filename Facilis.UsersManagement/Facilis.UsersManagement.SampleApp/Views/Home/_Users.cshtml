@@ -1,0 +1,55 @@
+﻿<script type="text/javascript">
+    const EDIT_USER_URL = "@Url.Content("~/users")";
+    const fetchUsers = () => {
+        axios.get('/api/user-profiles')
+            .then(response => that.users = response.data);
+    };
+    const data = {
+        users: [],
+        init: function () {
+            that = this;
+
+            cssLoader.show()
+                .then(fetchUsers)
+                .then(cssLoader.hide);
+        },
+    };
+</script>
+
+<div x-data="data">
+    <div class="card p-2">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Nickname</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <template x-for="user in users">
+                        <tr>
+                            <td align="center">
+                                <a class="btn btn-primary"
+                                   x-bind:href="`${EDIT_USER_URL}/${user.id}`">
+                                    Edit
+                                </a>
+                            </td>
+
+                            <td valign="middle" x-text="user.username.toLowerCase() || '- - - -'"></td>
+                            <td valign="middle" x-text="user.email || '- - - -'"></td>
+                            <td valign="middle" x-text="user.nickname || '- - - -'"></td>
+                            <td valign="middle" x-text="user.firstName || '- - - -'"></td>
+                            <td valign="middle" x-text="user.lastName || '- - - -'"></td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

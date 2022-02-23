@@ -1,3 +1,18 @@
-﻿<div class="vh-100">
+﻿@using Facilis.UsersManagement.SampleApp.Enums
 
+<div class="d-flex flex-column vh-100 py-3">
+    <div class="pb-3 px-3">
+        <partial name="_UserPanel" />
+    </div>
+
+    <div class="flex-grow-1 px-3">
+        @if (!this.Context.User.IsInRole(nameof(RoleTypes.Administrator)))
+        {
+            <partial name="_UserEditForm" />
+        }
+        else
+        {
+            <partial name="_Users" />
+        }
+    </div>
 </div>

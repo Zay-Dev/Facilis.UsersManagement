@@ -3,15 +3,18 @@ using Facilis.Core.EntityFrameworkCore;
 using Facilis.Core.EntityFrameworkCore.Abstractions;
 using Facilis.UsersManagement;
 using Facilis.UsersManagement.Abstractions;
-using Facilis.UsersManagement.Models;
 using Facilis.UsersManagement.SampleApp;
 using Facilis.UsersManagement.SampleApp.Helpers;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 static void ConfigureService(WebApplicationBuilder builder)
 {
-    builder.Services.AddControllersWithViews();
+    builder.Services
+        .AddControllersWithViews();
+
     builder.Services
         .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddCookie(options =>
@@ -24,7 +27,7 @@ static void ConfigureService(WebApplicationBuilder builder)
     builder.Services
         .AddHttpContextAccessor()
         .AddSingleton<IPasswordHasher, BCryptNetPasswordHasher>()
-        .AddScoped<IAuthenticator, Authenticator<User<UserProfile>>>()
+        .AddScoped<IAuthenticator, Authenticator<User>>()
 
         .AddScoped<IOperators>(provider => new Operators()
         {
@@ -80,6 +83,11 @@ static void Configure(WebApplication app)
     app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
+
+    JsonConvert.DefaultSettings = () => new JsonSerializerSettings()
+    {
+        ContractResolver = new CamelCasePropertyNamesContractResolver()
+    };
 }
 
 var builder = WebApplication.CreateBuilder(args);
