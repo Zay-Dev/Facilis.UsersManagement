@@ -1,5 +1,6 @@
 ﻿using Facilis.Core.Abstractions;
 using Facilis.Core.Enums;
+using Facilis.UsersManagement.Models;
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
@@ -59,5 +60,9 @@ namespace Facilis.UsersManagement.Abstractions
         {
             this.SerializedProfile = JsonSerializer.Serialize(profile);
         }
+    }
+
+    public class User : User<UserProfile>
+    {
     }
 }
