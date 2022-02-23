@@ -1,0 +1,101 @@
+﻿@using Facilis.UsersManagement.Models
+@model Facilis.UsersManagement.Abstractions.User
+
+@{
+    var profile = Model.GetProfile<UserProfile>();
+    var data = new
+    {
+        Model.Id,
+        profile.Email,
+        profile.Nickname,
+        profile.FirstName,
+        profile.LastName,
+    };
+}
+
+<script type="text/javascript">
+    const data = {
+        form: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(data)),
+
+        init: function () {
+            that = this;
+        },
+    };
+    const update = () => {
+        return cssLoader.show()
+            .then(() => axios.patch('/api/users/@Model.Id/profiles', data.form))
+            .then(() => document.location.reload());
+    };
+</script>
+
+<div x-data="data">
+    <div class="mt-4">
+        <div class="row">
+            <div class="col-12 col-md-6 offset-md-3">
+                <div class="card p-4 pb-2">
+                    <div class="row">
+                        <div class="col-12">
+                            <h5 class="mb-4">Profile</h5>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center mb-3"
+                         x-show="form.email">
+                        <div class="col-4">Email</div>
+
+                        <div class="col-8" x-text="form.email"></div>
+                    </div>
+
+                    <div class="row align-items-center mb-3">
+                        <div class="col-4">Nickname</div>
+
+                        <div class="col-8">
+                            <input class="form-control"
+                                   x-model="form.nickname" />
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center mb-3">
+                        <div class="col-4">First Name</div>
+
+                        <div class="col-8">
+                            <input class="form-control"
+                                   x-model="form.firstName" />
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center mb-3">
+                        <div class="col-4">Last Name</div>
+
+                        <div class="col-8">
+                            <input class="form-control"
+                                   x-model="form.lastName" />
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center mb-3">
+                        <div class="col-12 small text-end">
+                            @profile.LastSignInAtUtc.ToString("HH:mm:ss dd MMM, yyyy")
+                            (+00:00)
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="text-end">
+                                <a href="~/" class="btn btn-link">Back</a>
+
+                                <button class="btn btn-primary ms-2"
+                                        x-on:click="update()">
+                                    Update
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
