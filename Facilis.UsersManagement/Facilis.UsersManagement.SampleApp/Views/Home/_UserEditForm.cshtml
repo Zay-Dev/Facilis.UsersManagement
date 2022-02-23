@@ -1,7 +1,9 @@
 ﻿@using Facilis.UsersManagement.Models
+@using Facilis.UsersManagement.SampleApp.Enums
 @model Facilis.UsersManagement.Abstractions.User
 
 @{
+    var isAdmin = this.Context.User.IsInRole(nameof(RoleTypes.Administrator));
     var profile = Model.GetProfile<UserProfile>();
     var data = new
     {
@@ -17,6 +19,7 @@
     const data = {
         form: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(data)),
 
+        isAdmin: @($"{isAdmin}".ToLower()),
         init: function () {
             that = this;
         },
@@ -40,10 +43,19 @@
                     </div>
 
                     <div class="row align-items-center mb-3"
-                         x-show="form.email">
+                         x-show="form.email || isAdmin">
                         <div class="col-4">Email</div>
 
-                        <div class="col-8" x-text="form.email"></div>
+                        <div class="col-8">
+                            <template x-if="!isAdmin">
+                                <span x-text="form.email"></span>
+                            </template>
+
+                            <template x-if="isAdmin">
+                                <input class="form-control"
+                                       x-model="form.email" />
+                            </template>
+                        </div>
                     </div>
 
                     <div class="row align-items-center mb-3">
@@ -85,7 +97,10 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="text-end">
-                                <a href="~/" class="btn btn-link">Back</a>
+                                <a href="~/" class="btn btn-link"
+                                   x-show="isAdmin">
+                                    Back
+                                </a>
 
                                 <button class="btn btn-primary ms-2"
                                         x-on:click="update()">

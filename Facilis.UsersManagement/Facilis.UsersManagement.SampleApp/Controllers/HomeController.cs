@@ -2,6 +2,7 @@
 using Facilis.UsersManagement.Abstractions;
 using Facilis.UsersManagement.Enums;
 using Facilis.UsersManagement.Models;
+using Facilis.UsersManagement.SampleApp.Enums;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -37,6 +38,18 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
                 .Value;
 
             return View(this.users.FindById(userId));
+        }
+
+        [Route("~/users/{id}")]
+        public IActionResult EditUser(string id)
+        {
+            if (!this.User.IsInRole(nameof(RoleTypes.Administrator)))
+            {
+                return Unauthorized();
+            }
+
+            var user = this.users.FindById(id);
+            return user == null ? NotFound() : View(user);
         }
 
         [AllowAnonymous]
