@@ -15,7 +15,7 @@
 
 <script type="text/javascript">
     const data = {
-        form: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(data)),
+        form: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(data)),
 
         init: function () {
             that = this;

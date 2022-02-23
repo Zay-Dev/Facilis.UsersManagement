@@ -7,10 +7,14 @@ using Facilis.UsersManagement.SampleApp;
 using Facilis.UsersManagement.SampleApp.Helpers;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 static void ConfigureService(WebApplicationBuilder builder)
 {
-    builder.Services.AddControllersWithViews();
+    builder.Services
+        .AddControllersWithViews();
+
     builder.Services
         .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddCookie(options =>
@@ -79,6 +83,11 @@ static void Configure(WebApplication app)
     app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
+
+    JsonConvert.DefaultSettings = () => new JsonSerializerSettings()
+    {
+        ContractResolver = new CamelCasePropertyNamesContractResolver()
+    };
 }
 
 var builder = WebApplication.CreateBuilder(args);
