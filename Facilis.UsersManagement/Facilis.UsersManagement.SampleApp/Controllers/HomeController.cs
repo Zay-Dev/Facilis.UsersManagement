@@ -14,13 +14,13 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
     public class HomeController : Controller
     {
         private IAuthenticator authenticator { get; }
-        private IEntities<User<UserProfile>> users { get; }
+        private IEntities<User> users { get; }
 
         #region Constructor(s)
 
         public HomeController(
             IAuthenticator authenticator,
-            IEntities<User<UserProfile>> users
+            IEntities<User> users
         )
         {
             this.authenticator = authenticator;
@@ -73,7 +73,7 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
 
             profile.LastSignInAtUtc = DateTime.UtcNow;
             user.SetProfile(profile);
-            this.users.Update((User<UserProfile>)user);
+            this.users.Update((User)user);
 
             return Redirect("~/");
         }

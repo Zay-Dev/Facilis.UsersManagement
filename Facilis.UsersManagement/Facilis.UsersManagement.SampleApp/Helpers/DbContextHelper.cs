@@ -14,7 +14,7 @@ namespace Facilis.UsersManagement.SampleApp.Helpers
 
         public static void SeedData(this IServiceProvider provider)
         {
-            var entities = provider.GetService<IEntities<User<UserProfile>>>();
+            var entities = provider.GetService<IEntities<User>>();
             var operators = provider.GetRequiredService<IOperators>();
 
             var password = provider.GetService<IPasswordHasher>().Hash(PASSWORD);
@@ -37,7 +37,7 @@ namespace Facilis.UsersManagement.SampleApp.Helpers
         }
 
         private static void CreateUserIfNotExists(
-            this IEntities<User<UserProfile>> entities,
+            this IEntities<User> entities,
             string username,
             IPassword password,
             RoleTypes[] roles,
@@ -49,7 +49,7 @@ namespace Facilis.UsersManagement.SampleApp.Helpers
                 .Any(x => x.Username.ToLower() == username.ToLower());
             if (exists) return;
 
-            var user = new User<UserProfile>()
+            var user = new User()
             {
                 Username = username,
                 CreatedBy = @operator,
