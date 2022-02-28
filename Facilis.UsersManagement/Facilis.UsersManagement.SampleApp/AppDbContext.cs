@@ -1,4 +1,5 @@
 ﻿using Facilis.Core.Abstractions;
+using Facilis.Core.EntityFrameworkCore.Helpers;
 using Facilis.UsersManagement.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +23,8 @@ namespace Facilis.UsersManagement.SampleApp
             builder.Entity<User>()
                 .HasIndex(user => user.Username)
                 .IsUnique();
+
+            this.UseStringifyEnumColumns(builder);
             base.OnModelCreating(builder);
         }
     }

@@ -15,7 +15,7 @@ namespace Facilis.UsersManagement.SampleApp.Helpers
         public static void SeedData(this IServiceProvider provider)
         {
             var entities = provider.GetService<IEntities<User>>();
-            var operators = provider.GetRequiredService<IOperators>();
+            var entityStampsBinder = provider.GetRequiredService<IEntityStampsBinder>();
 
             var password = provider.GetService<IPasswordHasher>().Hash(PASSWORD);
 
@@ -25,14 +25,14 @@ namespace Facilis.UsersManagement.SampleApp.Helpers
                 USERNAME,
                 password,
                 new[] { RoleTypes.User },
-                operators.GetSystemOperatorName()
+                entityStampsBinder
             );
 
             entities.CreateUserIfNotExists(
                 ADMIN,
                 password,
                 new[] { RoleTypes.Administrator, RoleTypes.User },
-                operators.GetSystemOperatorName()
+                entityStampsBinder
             );
         }
 
@@ -41,7 +41,7 @@ namespace Facilis.UsersManagement.SampleApp.Helpers
             string username,
             IPassword password,
             RoleTypes[] roles,
-            string @operator
+            IEntityStampsBinder entityStampsBinder
         )
         {
             var exists = entities
@@ -49,17 +49,15 @@ namespace Facilis.UsersManagement.SampleApp.Helpers
                 .Any(x => x.Username.ToLower() == username.ToLower());
             if (exists) return;
 
-            var user = new User()
-            {
-                Username = username,
-                CreatedBy = @operator,
-                UpdatedBy = @operator,
-
-                HashingMethod = password.HashingMethod,
-                HashedPassword = password.HashedPassword,
-                PasswordSalt = password.PasswordSalt,
-                PasswordIterated = password.PasswordIterated,
-            };
+            var user = entityStampsBinder
+                .BindCreatedBySystem(new User()
+                {
+                    Username = username,
+                    HashingMethod = password.HashingMethod,
+                    HashedPassword = password.HashedPassword,
+                    PasswordSalt = password.PasswordSalt,
+                    PasswordIterated = password.PasswordIterated,
+                });
             user.SetProfile(new UserProfile()
             {
                 Roles = roles.Select(x => x.ToString()).ToArray(),

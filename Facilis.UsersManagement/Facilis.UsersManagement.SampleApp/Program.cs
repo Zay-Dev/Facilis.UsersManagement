@@ -29,10 +29,10 @@ static void ConfigureService(WebApplicationBuilder builder)
         .AddSingleton<IPasswordHasher, BCryptNetPasswordHasher>()
         .AddScoped<IAuthenticator, Authenticator<User>>()
 
-        .AddScoped<IOperators>(provider => new Operators()
+        .AddScoped<IEntityStampsBinder>(provider => new EntityStampsBinder()
         {
-            SystemOperatorName = nameof(System),
-            CurrentOperatorName = provider.GetService<IHttpContextAccessor>()
+            SystemOperatorIdentifier = nameof(System),
+            CurrentUserIdentifier = provider.GetService<IHttpContextAccessor>()
                 .HttpContext?
                 .User?
                 .Identity?
