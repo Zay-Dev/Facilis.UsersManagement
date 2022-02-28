@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Facilis.Core\Facilis.Core\Facilis.Core.EntityFrameworkCore\Facilis.Core.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\..\..\Facilis.Core\Facilis.Core\Facilis.Extensions.EntityFrameworkCore\Facilis.Extensions.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\Facilis.UsersManagement\Facilis.UsersManagement.csproj" />
   </ItemGroup>
 
