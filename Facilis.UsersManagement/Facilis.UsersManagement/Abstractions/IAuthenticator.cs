@@ -19,6 +19,11 @@ namespace Facilis.UsersManagement.Abstractions
         LoginFailureTypes TryAuthenticate(string username, string password, out IUser user);
     }
 
+    public interface IAuthenticator<T> : IAuthenticator where T : IUser
+    {
+        LoginFailureTypes TryAuthenticate(string username, string password, out T user);
+    }
+
     public class Authenticator<T> : IAuthenticator where T : IUser
     {
         private IEntities<T> entities { get; }
@@ -39,6 +44,14 @@ namespace Facilis.UsersManagement.Abstractions
         #endregion Constructor(s)
 
         public LoginFailureTypes TryAuthenticate(string username, string password, out IUser user)
+        {
+            var failureType = this.TryAuthenticate(username, password, out T concreteUser);
+            user = concreteUser;
+
+            return failureType;
+        }
+
+        public LoginFailureTypes TryAuthenticate(string username, string password, out T user)
         {
             var failureType = LoginFailureTypes.None;
             user = this.FindByUsername(username);
@@ -72,7 +85,7 @@ namespace Facilis.UsersManagement.Abstractions
             return failureType;
         }
 
-        protected virtual void OnAuthenticated(IUser user)
+        protected virtual void OnAuthenticated(T user)
         {
             this.Authenticated?.Invoke(this, user);
         }
@@ -86,14 +99,14 @@ namespace Facilis.UsersManagement.Abstractions
             this.AuthenticateFailed?.Invoke(this, type, username, password);
         }
 
-        private IUser FindByUsername(string username)
+        private T FindByUsername(string username)
         {
             return this.entities.Rows.FirstOrDefault(entity =>
                 entity.Username.ToLower() == username.ToLower()
             );
         }
 
-        private static bool IsLocked(IUser user)
+        private static bool IsLocked(T user)
         {
             return user.LockedUntilUtc.HasValue &&
                 user.LockedUntilUtc > DateTime.UtcNow;
