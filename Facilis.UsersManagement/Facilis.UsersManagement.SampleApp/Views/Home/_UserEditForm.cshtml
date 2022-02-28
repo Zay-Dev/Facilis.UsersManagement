@@ -4,7 +4,7 @@
 
 @{
     var isAdmin = this.Context.User.IsInRole(nameof(RoleTypes.Administrator));
-    var profile = Model.GetProfile<UserProfile>();
+    var profile = Model.Profile;
     var data = new
     {
         Model.Id,

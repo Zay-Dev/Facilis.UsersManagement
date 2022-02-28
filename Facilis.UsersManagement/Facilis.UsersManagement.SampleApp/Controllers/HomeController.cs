@@ -74,7 +74,7 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
                 return RedirectToAction(nameof(SignIn));
             }
 
-            var profile = (UserProfile)user.Profile;
+            var profile = (UserProfile)user.UncastedProfile;
             var roleClaims = profile.Roles
                 .Select(role => new Claim(ClaimTypes.Role, role))
                 .ToArray();

@@ -30,7 +30,7 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
 
             return new JsonResult(this.users
                 .WhereEnabled()
-                .Select(user => new { user, profile = user.Profile as UserProfile })
+                .Select(user => new { user, profile = user.Profile })
                 .Select(entity => new
                 {
                     entity.user.Id,
