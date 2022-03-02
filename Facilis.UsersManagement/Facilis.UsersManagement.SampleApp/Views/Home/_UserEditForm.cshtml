@@ -1,9 +1,9 @@
-﻿@using Facilis.UsersManagement.Models
+﻿@using Facilis.UsersManagement.Helpers
 @using Facilis.UsersManagement.SampleApp.Enums
 @model Facilis.UsersManagement.Abstractions.User
 
 @{
-    var isAdmin = this.Context.User.IsInRole(nameof(RoleTypes.Administrator));
+    var isAdmin = this.Context.User.IsInRole(RoleTypes.Administrator);
     var profile = Model.Profile;
     var data = new
     {

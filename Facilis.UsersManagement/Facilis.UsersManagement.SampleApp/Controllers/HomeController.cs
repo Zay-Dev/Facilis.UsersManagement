@@ -65,11 +65,23 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
 
             if (failureType != LoginFailureTypes.None)
             {
-                TempData["Username"] = username;
-                TempData["IsRetry"] = true;
+                this.SaveFailureTempData(username);
                 return RedirectToAction(nameof(SignIn));
             }
 
+            await this.SignInAsync(user);
+            return Redirect("~/");
+        }
+
+        [Route("~/sign-out")]
+        public async Task<IActionResult> SignOutAsync()
+        {
+            await this.HttpContext.SignOutAsync();
+            return Redirect("~/");
+        }
+
+        private async Task SignInAsync(User user)
+        {
             var profile = user.Profile;
             var identity = new ClaimsIdentity(
                 user.ToClaims(),
@@ -81,15 +93,12 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
             profile.LastSignInAtUtc = DateTime.UtcNow;
             user.SetProfile(profile);
             this.users.Update(user);
-
-            return Redirect("~/");
         }
 
-        [Route("~/sign-out")]
-        public async Task<IActionResult> SignOut()
+        private void SaveFailureTempData(string username)
         {
-            await this.HttpContext.SignOutAsync();
-            return Redirect("~/");
+            TempData["Username"] = username;
+            TempData["IsRetry"] = true;
         }
     }
 }
