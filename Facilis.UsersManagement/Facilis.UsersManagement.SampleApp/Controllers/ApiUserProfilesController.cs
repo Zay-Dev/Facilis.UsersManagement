@@ -3,8 +3,11 @@ using Facilis.UsersManagement.Abstractions;
 using Facilis.UsersManagement.Helpers;
 using Facilis.UsersManagement.Models;
 using Facilis.UsersManagement.SampleApp.Enums;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Facilis.UsersManagement.SampleApp.Controllers
 {
@@ -44,7 +47,7 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
         }
 
         [HttpPatch]
-        public IActionResult Index(string userId, [FromBody] UserProfile model)
+        public async Task<IActionResult> Index(string userId, [FromBody] UserProfile model)
         {
             var isAdmin = this.IsMeAdmin();
             var myUserId = this.User.GetIdentifier().Value;
@@ -61,7 +64,22 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
 
             user.SetProfile(user.Profile);
             this.users.Update(user);
+
+            if (userId == myUserId)
+            {
+                await this.SignInAsync(user);
+            }
             return Ok();
+        }
+
+        private async Task SignInAsync(User user)
+        {
+            var identity = new ClaimsIdentity(
+                user.ToClaims(),
+                CookieAuthenticationDefaults.AuthenticationScheme
+            );
+
+            await this.HttpContext.SignInAsync(new ClaimsPrincipal(identity));
         }
 
         private bool IsMeAdmin() => this.User.IsInRole(RoleTypes.Administrator);
