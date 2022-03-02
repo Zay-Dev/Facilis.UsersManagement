@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Text.Json;
 
 namespace Facilis.UsersManagement.Helpers
 {
@@ -67,10 +66,10 @@ namespace Facilis.UsersManagement.Helpers
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Name, user.Username),
-                new Claim(nameof(user.Profile.Nickname), user.Profile.Nickname),
-                new Claim(ClaimTypes.Email, user.Profile.Email),
-                new Claim(ClaimTypes.GivenName, user.Profile.FirstName),
-                new Claim(ClaimTypes.Surname, user.Profile.LastName),
+                new Claim(nameof(user.Profile.Nickname), user.Profile.Nickname ?? ""),
+                new Claim(ClaimTypes.Email, user.Profile.Email ?? ""),
+                new Claim(ClaimTypes.GivenName, user.Profile.FirstName ?? ""),
+                new Claim(ClaimTypes.Surname, user.Profile.LastName ?? ""),
             }
                 .Concat(user.Profile
                     .Roles
@@ -87,9 +86,7 @@ namespace Facilis.UsersManagement.Helpers
                 Email = claims.GetValueOfClaimType(ClaimTypes.Email),
                 FirstName = claims.GetValueOfClaimType(ClaimTypes.GivenName),
                 LastName = claims.GetValueOfClaimType(ClaimTypes.Surname),
-                Roles = JsonSerializer.Deserialize<string[]>(claims
-                    .GetValueOfClaimType(ClaimTypes.Role)
-                ),
+                Roles = claims.GetRoles().Select(claim => claim.Value).ToArray(),
             };
         }
 
