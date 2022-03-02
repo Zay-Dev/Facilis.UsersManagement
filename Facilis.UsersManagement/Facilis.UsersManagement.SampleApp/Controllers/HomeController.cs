@@ -1,7 +1,7 @@
 ﻿using Facilis.Core.Abstractions;
 using Facilis.UsersManagement.Abstractions;
 using Facilis.UsersManagement.Enums;
-using Facilis.UsersManagement.Models;
+using Facilis.UsersManagement.Helpers;
 using Facilis.UsersManagement.SampleApp.Enums;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -14,13 +14,13 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
     [Authorize]
     public class HomeController : Controller
     {
-        private IAuthenticator authenticator { get; }
+        private IAuthenticator<User> authenticator { get; }
         private IEntities<User> users { get; }
 
         #region Constructor(s)
 
         public HomeController(
-            IAuthenticator authenticator,
+            IAuthenticator<User> authenticator,
             IEntities<User> users
         )
         {
@@ -32,18 +32,14 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
 
         public IActionResult Index()
         {
-            var userId = this.User
-                .Claims
-                .First(claim => claim.Type == ClaimTypes.NameIdentifier)
-                .Value;
-
+            var userId = this.User.GetIdentifier()?.Value;
             return View(this.users.FindById(userId));
         }
 
         [Route("~/users/{id}")]
         public IActionResult EditUser(string id)
         {
-            if (!this.User.IsInRole(nameof(RoleTypes.Administrator)))
+            if (!this.User.IsInRole(RoleTypes.Administrator))
             {
                 return Unauthorized();
             }
@@ -74,16 +70,9 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
                 return RedirectToAction(nameof(SignIn));
             }
 
-            var profile = (UserProfile)user.UncastedProfile;
-            var roleClaims = profile.Roles
-                .Select(role => new Claim(ClaimTypes.Role, role))
-                .ToArray();
+            var profile = user.Profile;
             var identity = new ClaimsIdentity(
-                roleClaims.Concat(new[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id),
-                    new Claim(ClaimTypes.Name, user.Username),
-                }),
+                user.ToClaims(),
                 CookieAuthenticationDefaults.AuthenticationScheme
             );
 
@@ -91,7 +80,7 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
 
             profile.LastSignInAtUtc = DateTime.UtcNow;
             user.SetProfile(profile);
-            this.users.Update((User)user);
+            this.users.Update(user);
 
             return Redirect("~/");
         }

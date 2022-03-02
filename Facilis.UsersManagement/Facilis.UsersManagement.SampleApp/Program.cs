@@ -28,6 +28,7 @@ static void ConfigureService(WebApplicationBuilder builder)
         .AddHttpContextAccessor()
         .AddSingleton<IPasswordHasher, BCryptNetPasswordHasher>()
         .AddScoped<IAuthenticator, Authenticator<User>>()
+        .AddScoped<IAuthenticator<User>, Authenticator<User>>()
 
         .AddScoped<IEntityStampsBinder>(provider => new EntityStampsBinder()
         {

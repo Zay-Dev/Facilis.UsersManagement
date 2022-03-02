@@ -1,13 +1,8 @@
-﻿@using System.Security.Claims
+﻿@using Facilis.UsersManagement.Helpers
 @using Facilis.UsersManagement.SampleApp.Enums
 @{
-    var roles = this.Context.User.Identity?.IsAuthenticated == true ?
-        this.Context.User.Claims
-            .Where(claim => claim.Type == ClaimTypes.Role)
-            .Select(claim => claim.Value)
-            .ToArray() : Array.Empty<string>();
-    var isAdmin = this.Context.User.Identity?.IsAuthenticated == true ?
-        this.Context.User.IsInRole(nameof(RoleTypes.Administrator)) : false;
+    var roles = this.Context.User.GetRoles().Select(role => role.Value);
+    var isAdmin = this.Context.User.IsInRole(RoleTypes.Administrator);
 }
 
 <div class="card p-2">

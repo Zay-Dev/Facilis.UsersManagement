@@ -1,10 +1,10 @@
 ﻿using Facilis.Core.Abstractions;
 using Facilis.UsersManagement.Abstractions;
+using Facilis.UsersManagement.Helpers;
 using Facilis.UsersManagement.Models;
 using Facilis.UsersManagement.SampleApp.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace Facilis.UsersManagement.SampleApp.Controllers
 {
@@ -47,32 +47,23 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
         public IActionResult Index(string userId, [FromBody] UserProfile model)
         {
             var isAdmin = this.IsMeAdmin();
-            var myUserId = this.User
-                .Claims
-                .First(claim => claim.Type == ClaimTypes.NameIdentifier)
-                .Value;
+            var myUserId = this.User.GetIdentifier().Value;
 
             if (!isAdmin && userId != myUserId) return BadRequest();
 
             var user = this.users.FindById(userId);
-            if (user?.Profile is not UserProfile profile)
-            {
-                return NotFound();
-            }
+            if (user?.Profile == null) return NotFound();
 
-            if (isAdmin) profile.Email = model.Email;
-            profile.Nickname = model.Nickname;
-            profile.FirstName = model.FirstName;
-            profile.LastName = model.LastName;
+            if (isAdmin) user.Profile.Email = model.Email;
+            user.Profile.Nickname = model.Nickname;
+            user.Profile.FirstName = model.FirstName;
+            user.Profile.LastName = model.LastName;
 
-            user.SetProfile(profile);
+            user.SetProfile(user.Profile);
             this.users.Update(user);
             return Ok();
         }
 
-        private bool IsMeAdmin()
-        {
-            return this.User.IsInRole(nameof(RoleTypes.Administrator));
-        }
+        private bool IsMeAdmin() => this.User.IsInRole(RoleTypes.Administrator);
     }
 }
