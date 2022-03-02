@@ -20,9 +20,13 @@ namespace Facilis.UsersManagement.SampleApp
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<User>()
-                .HasIndex(user => user.Username)
-                .IsUnique();
+            builder.HasUniqueIndex<User>(user => user.Username);
+            builder.HasIndex<ExtendedAttribute>(attribute => new
+            {
+                attribute.Scope,
+                attribute.ScopedId,
+                attribute.Key
+            });
 
             this.UseStringifyEnumColumns(builder);
             base.OnModelCreating(builder);

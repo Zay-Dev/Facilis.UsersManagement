@@ -33,7 +33,10 @@ static void ConfigureService(WebApplicationBuilder builder)
         {
             SystemOperatorIdentifier = nameof(System),
             CurrentUserIdentifier = provider.GetService<IHttpContextAccessor>()
-                .HttpContext.User.GetIdentifier().Value
+                .HttpContext?
+                .User?
+                .GetIdentifier()?
+                .Value
         })
 
         .AddDbContext<AppDbContext>(option =>
