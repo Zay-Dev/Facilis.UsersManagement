@@ -24,7 +24,8 @@ namespace Facilis.UsersManagement.Abstractions
         LoginFailureTypes TryAuthenticate(string username, string password, out T user);
     }
 
-    public class Authenticator<T> : IAuthenticator where T : IUser
+    public class Authenticator<T> : IAuthenticator, IAuthenticator<T>
+        where T : IUser
     {
         private IEntities<T> entities { get; }
         private IPasswordHasher passwordHasher { get; }
