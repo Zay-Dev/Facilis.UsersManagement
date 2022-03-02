@@ -25,13 +25,21 @@ namespace Facilis.UsersManagement.Abstractions
 
     public class User<T> : IUser<T>
     {
+        private T profile;
         private string serializedProfile;
 
         public string Username { get; set; }
         public DateTime? LockedUntilUtc { get; set; }
 
         [NotMapped]
-        public T Profile => this.GetProfile();
+        public T Profile
+        {
+            get
+            {
+                this.profile ??= this.GetProfile();
+                return this.profile;
+            }
+        }
 
         [NotMapped]
         public object UncastedProfile => this.Profile;
@@ -41,7 +49,11 @@ namespace Facilis.UsersManagement.Abstractions
         public string SerializedProfile
         {
             get => this.serializedProfile;
-            set { this.serializedProfile = value; }
+            set
+            {
+                this.serializedProfile = value;
+                this.profile = this.GetProfile();
+            }
         }
 
         public StatusTypes Status { get; set; }
@@ -65,7 +77,7 @@ namespace Facilis.UsersManagement.Abstractions
 
         public void SetProfile(object profile)
         {
-            this.SerializedProfile = JsonSerializer.Serialize(profile);
+            this.serializedProfile = JsonSerializer.Serialize(profile);
         }
 
         public void SetProfile(T profile)
