@@ -4,14 +4,17 @@
 
 @{
     var isAdmin = this.Context.User.IsInRole(RoleTypes.Administrator);
-    var profile = Model.Profile;
+    var isNewUser = Model == null;
+    var profile = Model?.Profile;
     var data = new
     {
-        Model.Id,
-        profile.Email,
-        profile.Nickname,
-        profile.FirstName,
-        profile.LastName,
+        Model?.Id,
+        profile?.Email,
+        profile?.Nickname,
+        profile?.FirstName,
+        profile?.LastName,
+        Username = Model?.Username.ToLower(),
+        Password = "",
     };
 }
 
@@ -24,9 +27,14 @@
             that = this;
         },
     };
+    const add = () => {
+        return cssLoader.show()
+            .then(() => axios.post(`/api/users/${data.form.username}?password=${data.form.password}`, data.form))
+            .then(() => document.location.reload());
+    };
     const update = () => {
         return cssLoader.show()
-            .then(() => axios.patch('/api/users/@Model.Id/profiles', data.form))
+            .then(() => axios.patch('/api/users/@Model?.Id/profiles', data.form))
             .then(() => document.location.reload());
     };
 </script>
@@ -39,6 +47,36 @@
                     <div class="row">
                         <div class="col-12">
                             <h5 class="mb-4">Profile</h5>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center mb-3"
+                         x-show="isAdmin">
+                        <div class="col-4">Username</div>
+
+                        <div class="col-8">
+                            <template x-if="!@($"{isNewUser}".ToLower())">
+                                <span x-text="form.username"></span>
+                            </template>
+
+                            <template x-if="@($"{isNewUser}".ToLower())">
+                                <input class="form-control"
+                                       x-model="form.username" />
+                            </template>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center mb-3"
+                         x-show="@($"{isNewUser}".ToLower()) && isAdmin">
+                        <div class="col-4">Password</div>
+
+                        <div class="col-8">
+                            <template x-if="@($"{isNewUser}".ToLower())">
+                                <input class="form-control" type="password"
+                                       x-model="form.password"
+                                       x-on:mouseover="$el.setAttribute('type', 'text')"
+                                       x-on:mouseleave="$el.setAttribute('type', 'password')" />
+                            </template>
                         </div>
                     </div>
 
@@ -85,9 +123,10 @@
                         </div>
                     </div>
 
-                    <div class="row align-items-center mb-3">
+                    <div class="row align-items-center mb-3"
+                         x-show="@($"{profile != null}".ToLower())">
                         <div class="col-12 small text-end">
-                            @profile.LastSignInAtUtc.ToString("HH:mm:ss dd MMM, yyyy")
+                            @profile?.LastSignInAtUtc.ToString("HH:mm:ss dd MMM, yyyy")
                             (+00:00)
                         </div>
                     </div>
@@ -103,8 +142,8 @@
                                 </a>
 
                                 <button class="btn btn-primary ms-2"
-                                        x-on:click="update()">
-                                    Update
+                                        x-on:click="@(isNewUser ? "add()" : "update()")">
+                                    @(isNewUser ? "Add" : "Update")
                                 </button>
                             </div>
                         </div>
