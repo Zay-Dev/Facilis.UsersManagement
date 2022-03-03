@@ -15,12 +15,17 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
     [Route("~/api/users/{userId}/profiles")]
     public class ApiUserProfilesController : ControllerBase
     {
+        private IEntityStampsBinder entityStampsBinder { get; }
         private IEntities<User> users { get; }
 
         #region Constructor(s)
 
-        public ApiUserProfilesController(IEntities<User> users)
+        public ApiUserProfilesController(
+            IEntityStampsBinder entityStampsBinder,
+            IEntities<User> users
+        )
         {
+            this.entityStampsBinder = entityStampsBinder;
             this.users = users;
         }
 
@@ -46,6 +51,37 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
             );
         }
 
+        [HttpPost]
+        [Route("~/api/users/{username}")]
+        public IActionResult Index(
+            [FromServices] IPasswordHasher hasher,
+            [FromRoute] string username,
+            [FromQuery] string password,
+            [FromBody] UserProfile model
+        )
+        {
+            if (!this.IsMeAdmin()) return BadRequest();
+
+            var hashed = hasher.Hash(password);
+            var user = new User()
+            {
+                Username = username,
+                HashingMethod = hashed.HashingMethod,
+                HashedPassword = hashed.HashedPassword,
+                PasswordSalt = hashed.PasswordSalt,
+                PasswordIterated = hashed.PasswordIterated,
+            };
+
+            model.Roles = new[] { nameof(RoleTypes.User) };
+            model.LastSignInAtUtc = DateTime.UtcNow;
+            user.SetProfile(model);
+
+            this.entityStampsBinder.BindCreatedByUser(user);
+            this.users.Add(user);
+
+            return Ok();
+        }
+
         [HttpPatch]
         public async Task<IActionResult> Index(string userId, [FromBody] UserProfile model)
         {
@@ -63,6 +99,8 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
             user.Profile.LastName = model.LastName;
 
             user.SetProfile(user.Profile);
+            this.entityStampsBinder.BindUpdatedByUser(user);
+
             this.users.Update(user);
 
             if (userId == myUserId)

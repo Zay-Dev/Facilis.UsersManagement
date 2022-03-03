@@ -36,6 +36,7 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
             return View(this.users.FindById(userId));
         }
 
+        [Route("~/users")]
         [Route("~/users/{id}")]
         public IActionResult EditUser(string id)
         {
@@ -43,6 +44,8 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
             {
                 return Unauthorized();
             }
+
+            if (string.IsNullOrEmpty(id)) return View();
 
             var user = this.users.FindById(id);
             return user == null ? NotFound() : View(user);
