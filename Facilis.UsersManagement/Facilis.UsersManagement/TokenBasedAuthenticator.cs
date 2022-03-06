@@ -58,7 +58,11 @@ namespace Facilis.UsersManagement
             return LoginFailureTypes.None;
         }
 
-        private void TokenBasedAuthenticator_Authenticated(object sender, IAuthenticateInput input, IUser user)
+        protected virtual void TokenBasedAuthenticator_Authenticated(
+            object sender,
+            IAuthenticateInput input,
+            IUser user
+        )
         {
             foreach (var token in this.tokens
                 .WhereEnabled(token => token.UserId == user.Id)
