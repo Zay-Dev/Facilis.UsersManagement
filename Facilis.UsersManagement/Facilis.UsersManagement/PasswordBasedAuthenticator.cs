@@ -33,6 +33,8 @@ namespace Facilis.UsersManagement
             user = this.users.Rows.FirstOrDefault(entity =>
                 entity.Username.ToLower() == input.Username.ToLower()
             );
+
+            input.UserId = user?.Id;
             return LoginFailureTypes.None;
         }
     }

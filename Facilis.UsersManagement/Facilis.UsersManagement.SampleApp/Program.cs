@@ -29,6 +29,8 @@ static void ConfigureService(WebApplicationBuilder builder)
     builder.Services
         .AddHttpContextAccessor()
         .AddDefaultPasswordHasher()
+        .AddDefaultAuthenticationHistories()
+
         .AddPasswordBased<PasswordBasedAuthenticator<User>, User>()
         .AddTokenBased<TokenBasedAuthenticator<UserToken, User>, User>()
 

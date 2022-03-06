@@ -41,20 +41,22 @@ namespace Facilis.UsersManagement
 
         protected override LoginFailureTypes TryFindUser(ITokenBase input, out TUser user)
         {
-            var token = this.tokens.FindById(input.TokenId);
             user = default;
 
-            if (token == null)
-            {
-                return LoginFailureTypes.TokenNotFound;
-            }
-            else if (token.ExpiredAtUtc <= DateTime.UtcNow)
+            input.UserToken = this.tokens.FindById(input.TokenId);
+
+            if (input.UserToken == null) return LoginFailureTypes.TokenNotFound;
+
+            user = this.users.FindById(input.UserToken.UserId);
+            if (user == null) return LoginFailureTypes.UserNotFound;
+
+            input.UserId = user.Id;
+
+            if (input.UserToken.ExpiredAtUtc <= DateTime.UtcNow)
             {
                 return LoginFailureTypes.TokenIsExpired;
             }
 
-            input.UserToken = token;
-            user = this.users.FindById(input.UserToken.UserId);
             return LoginFailureTypes.None;
         }
 
