@@ -3,7 +3,6 @@
     public interface IAuthenticateInput
     {
         string MethodName { get; }
-        string IdentifierType { get; }
-        string Identifier { get; }
+        string Identifier { get; set; }
     }
 }

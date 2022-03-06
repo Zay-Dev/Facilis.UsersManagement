@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System;
+using System.Text.Json.Serialization;
 
 namespace Facilis.UsersManagement.Abstractions
 {
@@ -13,8 +14,7 @@ namespace Facilis.UsersManagement.Abstractions
         public const string METHOD_NAME = nameof(PasswordBase);
 
         public string MethodName => METHOD_NAME;
-        public string IdentifierType => nameof(Username);
-        public string Identifier => this.Username;
+        public string Identifier { get => this.Username; set => throw new NotImplementedException(); }
 
         public string Username { get; set; }
 

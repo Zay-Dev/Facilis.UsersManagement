@@ -1,4 +1,6 @@
-﻿namespace Facilis.UsersManagement.Abstractions
+﻿using System;
+
+namespace Facilis.UsersManagement.Abstractions
 {
     public interface ITokenBase : IAuthenticateInput
     {
@@ -13,8 +15,7 @@
         public const string METHOD_NAME = nameof(TokenBase);
 
         public string MethodName => METHOD_NAME;
-        public string IdentifierType { get; set; }
-        public string Identifier { get; set; }
+        public string Identifier { get => this.TokenId; set => throw new NotImplementedException(); }
 
         public string TokenId { get; set; }
         public string Value { get; set; }
