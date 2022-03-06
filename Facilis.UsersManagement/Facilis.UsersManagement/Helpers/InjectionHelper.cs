@@ -12,8 +12,7 @@ namespace Facilis.UsersManagement.Helpers
             where TUser : IUser
             where TAuthenticator : class, IAuthenticator<IPasswordBase, TUser>
         {
-            return services
-                .AddScoped<IAuthenticator<IPasswordBase, TUser>, TAuthenticator>();
+            return services.AddAuthenticator<IPasswordBase, TAuthenticator, TUser>();
         }
 
         public static IServiceCollection AddTokenBased<TAuthenticator, TUser>(
@@ -22,8 +21,7 @@ namespace Facilis.UsersManagement.Helpers
             where TUser : IUser
             where TAuthenticator : class, IAuthenticator<ITokenBase, TUser>
         {
-            return services
-                .AddScoped<IAuthenticator<ITokenBase, TUser>, TAuthenticator>();
+            return services.AddAuthenticator<ITokenBase, TAuthenticator, TUser>();
         }
 
         public static IServiceCollection AddDefaultPasswordHasher(
@@ -31,6 +29,43 @@ namespace Facilis.UsersManagement.Helpers
         )
         {
             return services.AddSingleton<IPasswordHasher, BCryptNetPasswordHasher>();
+        }
+
+        public static IServiceCollection AddDefaultAuthenticationHistories(
+            this IServiceCollection services
+        )
+        {
+            return services.AddScoped<IAuthenticationHistoryWriter, AuthenticationHistoryWriter>();
+        }
+
+        private static IServiceCollection AddAuthenticator<TInputService, TAuthenticator, TUser>(
+            this IServiceCollection services
+        )
+            where TInputService : IAuthenticateInput
+            where TUser : IUser
+            where TAuthenticator : class, IAuthenticator<TInputService, TUser>
+        {
+            return services
+                .AddScoped<IAuthenticator<TInputService, TUser>>(provider =>
+                {
+                    var authenticator = ActivatorUtilities
+                        .CreateInstance<TAuthenticator>(provider);
+                    var writer = provider.GetService<IAuthenticationHistoryWriter>();
+                    if (writer != null) authenticator.AddDefaultHistory(writer);
+
+                    return authenticator;
+                });
+        }
+
+        private static void AddDefaultHistory<TInput, TUser>(
+            this IAuthenticator<TInput, TUser> authenticator,
+            IAuthenticationHistoryWriter writer
+        )
+            where TInput : IAuthenticateInput
+            where TUser : IUser
+        {
+            authenticator.Authenticated += writer.Authenticated;
+            authenticator.AuthenticateFailed += writer.AuthenticateFailed;
         }
     }
 }
