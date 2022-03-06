@@ -58,8 +58,34 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
         }
 
         [AllowAnonymous]
-        [Route("~/sign-in")]
+        [Route("~/sign-in/otp")]
+        public IActionResult SignInWithToken()
+        {
+            return View();
+        }
+
         [HttpPost]
+        [AllowAnonymous]
+        [Route("~/sign-in/otp")]
+        public async Task<IActionResult> SignInWithToken(
+            [FromServices] IAuthenticator<ITokenBase, User> authenticator,
+            string tokenId,
+            string value
+        )
+        {
+            var authenticated = authenticator
+                .TryAuthenticate(new TokenBase()
+                {
+                    TokenId = tokenId,
+                    Value = value ?? ""
+                });
+
+            return await GetActionResultAsync("", authenticated);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("~/sign-in")]
         public async Task<IActionResult> SignIn(string username, string password)
         {
             var authenticated = this.passwordAuthenticator
@@ -69,6 +95,18 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
                     Password = password,
                 });
 
+            return await GetActionResultAsync(username, authenticated);
+        }
+
+        [Route("~/sign-out")]
+        public async Task<IActionResult> SignOutAsync()
+        {
+            await this.HttpContext.SignOutAsync();
+            return Redirect("~/");
+        }
+
+        private async Task<IActionResult> GetActionResultAsync(string username, IAuthenticatedResult<User> authenticated)
+        {
             if (authenticated.HasFailure())
             {
                 this.SaveFailureTempData(username);
@@ -76,13 +114,6 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
             }
 
             await this.SignInAsync(authenticated.User);
-            return Redirect("~/");
-        }
-
-        [Route("~/sign-out")]
-        public async Task<IActionResult> SignOutAsync()
-        {
-            await this.HttpContext.SignOutAsync();
             return Redirect("~/");
         }
 
