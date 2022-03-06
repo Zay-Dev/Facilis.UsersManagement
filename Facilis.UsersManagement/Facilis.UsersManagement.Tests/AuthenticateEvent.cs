@@ -1,4 +1,5 @@
-﻿using Facilis.UsersManagement.Enums;
+﻿using Facilis.UsersManagement.Abstractions;
+using Facilis.UsersManagement.Enums;
 using Facilis.UsersManagement.Tests.Helpers;
 using NUnit.Framework;
 using System;
@@ -43,7 +44,7 @@ namespace Facilis.UsersManagement.Tests
             };
             this.instances
                 .Authenticator
-                .TryAuthenticate(USERNAME, PASSWORD);
+                .TryAuthenticate(GetAuthenticateInput(USERNAME, PASSWORD));
 
             // Assert
             Assert.IsTrue(triggered);
@@ -59,18 +60,26 @@ namespace Facilis.UsersManagement.Tests
             // Act
             this.instances
                 .Authenticator
-                .AuthenticateFailed += (_, type, username, password) =>
+                .AuthenticateFailed += (_, type, __) =>
                 {
-                    Console.WriteLine($"{username} | {password}");
                     failureType = type;
                 };
             this.instances
                 .Authenticator
-                .TryAuthenticate(USERNAME, PASSWORD);
+                .TryAuthenticate(GetAuthenticateInput(USERNAME, PASSWORD));
 
             // Assert
             Assert.AreNotEqual(LoginFailureTypes.None, failureType);
             Assert.Pass();
+        }
+
+        private static PasswordBase GetAuthenticateInput(string username, string password)
+        {
+            return new()
+            {
+                Username = username,
+                Password = password,
+            };
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Facilis.UsersManagement.Abstractions
 {
     public delegate void AuthenticatedEventHandler(object sender, IUser user);
 
-    public delegate void AuthenticateFailedEventHandler(object sender, LoginFailureTypes type, string username, string password);
+    public delegate void AuthenticateFailedEventHandler(object sender, LoginFailureTypes type, object input);
 
     public interface IAuthenticator
     {
@@ -16,12 +16,12 @@ namespace Facilis.UsersManagement.Abstractions
 
         event AuthenticateFailedEventHandler AuthenticateFailed;
 
-        IAuthenticatedResult TryAuthenticate(string username, string password);
+        IAuthenticatedResult TryAuthenticate(IPasswordBase input);
     }
 
     public interface IAuthenticator<T> : IAuthenticator where T : IUser
     {
-        new IAuthenticatedResult<T> TryAuthenticate(string username, string password);
+        new IAuthenticatedResult<T> TryAuthenticate(IPasswordBase input);
     }
 
     public class Authenticator<T> : IAuthenticator<T>
@@ -44,15 +44,15 @@ namespace Facilis.UsersManagement.Abstractions
 
         #endregion Constructor(s)
 
-        IAuthenticatedResult IAuthenticator.TryAuthenticate(string username, string password)
+        IAuthenticatedResult IAuthenticator.TryAuthenticate(IPasswordBase input)
         {
-            return this.TryAuthenticate(username, password);
+            return this.TryAuthenticate(input);
         }
 
-        public IAuthenticatedResult<T> TryAuthenticate(string username, string password)
+        public IAuthenticatedResult<T> TryAuthenticate(IPasswordBase input)
         {
             var failureType = LoginFailureTypes.None;
-            var user = this.FindByUsername(username);
+            var user = this.FindByUsername(input.Username);
 
             if (user == null)
             {
@@ -66,14 +66,14 @@ namespace Facilis.UsersManagement.Abstractions
             {
                 failureType = LoginFailureTypes.LockedUser;
             }
-            else if (!this.passwordHasher.Verify(user, password))
+            else if (!this.passwordHasher.Verify(user, input.Password))
             {
                 failureType = LoginFailureTypes.PasswordMismatch;
             }
 
             if (failureType != LoginFailureTypes.None)
             {
-                this.OnAuthenticateFailed(failureType, username, password);
+                this.OnAuthenticateFailed(failureType, input);
             }
             else
             {
@@ -95,11 +95,10 @@ namespace Facilis.UsersManagement.Abstractions
 
         protected virtual void OnAuthenticateFailed(
             LoginFailureTypes type,
-            string username,
-            string password
+            object input
         )
         {
-            this.AuthenticateFailed?.Invoke(this, type, username, password);
+            this.AuthenticateFailed?.Invoke(this, type, input);
         }
 
         private T FindByUsername(string username)

@@ -1,4 +1,5 @@
 using Facilis.Core.Enums;
+using Facilis.UsersManagement.Abstractions;
 using Facilis.UsersManagement.Enums;
 using Facilis.UsersManagement.Tests.Helpers;
 using NUnit.Framework;
@@ -38,7 +39,7 @@ namespace Facilis.UsersManagement.Tests
             // Act
             var failure = this.instances
                 .Authenticator
-                .TryAuthenticate(USERNAME, PASSWORD)
+                .TryAuthenticate(GetAuthenticateInput(USERNAME, PASSWORD))
                 .Failure;
 
             // Assert
@@ -54,7 +55,7 @@ namespace Facilis.UsersManagement.Tests
             // Act
             var failure = this.instances
                 .Authenticator
-                .TryAuthenticate(USERNAME, PASSWORD)
+                .TryAuthenticate(GetAuthenticateInput(USERNAME, PASSWORD))
                 .Failure;
 
             // Assert
@@ -76,7 +77,7 @@ namespace Facilis.UsersManagement.Tests
             // Act
             var failure = this.instances
                 .Authenticator
-                .TryAuthenticate(USERNAME, PASSWORD)
+                .TryAuthenticate(GetAuthenticateInput(USERNAME, PASSWORD))
                 .Failure;
 
             // Assert
@@ -98,7 +99,7 @@ namespace Facilis.UsersManagement.Tests
             // Act
             var failure = this.instances
                 .Authenticator
-                .TryAuthenticate(USERNAME, PASSWORD)
+                .TryAuthenticate(GetAuthenticateInput(USERNAME, PASSWORD))
                 .Failure;
 
             // Assert
@@ -118,12 +119,21 @@ namespace Facilis.UsersManagement.Tests
             // Act
             var failure = this.instances
                 .Authenticator
-                .TryAuthenticate(USERNAME, "")
+                .TryAuthenticate(GetAuthenticateInput(USERNAME, ""))
                 .Failure;
 
             // Assert
             Assert.AreEqual(LoginFailureTypes.PasswordMismatch, failure);
             Assert.Pass();
+        }
+
+        private static PasswordBase GetAuthenticateInput(string username, string password)
+        {
+            return new()
+            {
+                Username = username,
+                Password = password,
+            };
         }
     }
 }

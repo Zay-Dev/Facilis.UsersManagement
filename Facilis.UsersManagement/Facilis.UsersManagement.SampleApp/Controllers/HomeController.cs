@@ -63,7 +63,11 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
         public async Task<IActionResult> SignIn(string username, string password)
         {
             var authenticated = this.authenticator
-                .TryAuthenticate(username, password);
+                .TryAuthenticate(new PasswordBase()
+                {
+                    Username = username,
+                    Password = password,
+                });
 
             if (authenticated.HasFailure())
             {
