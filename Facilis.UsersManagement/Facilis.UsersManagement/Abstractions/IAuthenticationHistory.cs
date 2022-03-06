@@ -11,6 +11,7 @@ namespace Facilis.UsersManagement.Abstractions
     {
         LoginFailureTypes Failure { get; }
         string MethodName { get; }
+        string Identifier { get; }
         string Information { get; }
     }
 
@@ -24,6 +25,7 @@ namespace Facilis.UsersManagement.Abstractions
         public string UserId { get; set; }
         public LoginFailureTypes Failure { get; set; }
         public string MethodName { get; set; }
+        public string Identifier { get; set; }
         public string Information { get; set; }
     }
 }

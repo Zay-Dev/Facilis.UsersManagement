@@ -33,29 +33,31 @@ namespace Facilis.UsersManagement.Abstractions
 
         private void OnAuthenticated(object sender, IAuthenticateInput input, IUser user)
         {
-            var history = new AuthenticationHistory()
-            {
-                UserId = user.Id,
-                Failure = LoginFailureTypes.None,
-                MethodName = input.MethodName,
-                Information = JsonSerializer.Serialize(input)
-            };
-
-            this.stampsBinder.BindCreatedBySystem(history);
-            this.histories.Add(history);
+            this.histories.Add(this.ToHistory(user.Id, input, LoginFailureTypes.None));
         }
 
         private void OnAuthenticateFailed(object sender, IAuthenticateInput input, LoginFailureTypes type)
         {
+            this.histories.Add(this.ToHistory(null, input, type));
+        }
+
+        private AuthenticationHistory ToHistory(
+            string userId,
+            IAuthenticateInput input,
+            LoginFailureTypes type
+        )
+        {
             var history = new AuthenticationHistory()
             {
+                UserId = userId,
                 Failure = type,
                 MethodName = input.MethodName,
-                Information = JsonSerializer.Serialize(input, input.GetType())
+                Identifier = input.Identifier,
+                Information = JsonSerializer.Serialize(input, input.GetType()),
             };
 
             this.stampsBinder.BindCreatedBySystem(history);
-            this.histories.Add(history);
+            return history;
         }
     }
 }
