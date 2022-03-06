@@ -6,9 +6,9 @@ using System.Linq;
 
 namespace Facilis.UsersManagement.Abstractions
 {
-    public delegate void AuthenticatedEventHandler(object sender, IUser user);
+    public delegate void AuthenticatedEventHandler(object sender, IAuthenticateInput input, IUser user);
 
-    public delegate void AuthenticateFailedEventHandler(object sender, LoginFailureTypes type, object input);
+    public delegate void AuthenticateFailedEventHandler(object sender, IAuthenticateInput input, LoginFailureTypes type);
 
     public interface IAuthenticator
     {
@@ -73,11 +73,11 @@ namespace Facilis.UsersManagement.Abstractions
 
             if (failureType != LoginFailureTypes.None)
             {
-                this.OnAuthenticateFailed(failureType, input);
+                this.OnAuthenticateFailed(input, failureType);
             }
             else
             {
-                this.OnAuthenticated(user);
+                this.OnAuthenticated(input, user);
             }
 
             return new AuthenticatedResult<T>()
@@ -88,17 +88,17 @@ namespace Facilis.UsersManagement.Abstractions
             };
         }
 
-        protected virtual void OnAuthenticated(T user)
+        protected virtual void OnAuthenticated(IAuthenticateInput input, T user)
         {
-            this.Authenticated?.Invoke(this, user);
+            this.Authenticated?.Invoke(this, input, user);
         }
 
         protected virtual void OnAuthenticateFailed(
-            LoginFailureTypes type,
-            object input
+            IAuthenticateInput input,
+            LoginFailureTypes type
         )
         {
-            this.AuthenticateFailed?.Invoke(this, type, input);
+            this.AuthenticateFailed?.Invoke(this, input, type);
         }
 
         private T FindByUsername(string username)

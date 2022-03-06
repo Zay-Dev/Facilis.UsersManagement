@@ -2,7 +2,6 @@
 using Facilis.UsersManagement.Enums;
 using Facilis.UsersManagement.Tests.Helpers;
 using NUnit.Framework;
-using System;
 
 namespace Facilis.UsersManagement.Tests
 {
@@ -30,24 +29,28 @@ namespace Facilis.UsersManagement.Tests
         {
             // Arrange
             var triggered = false;
+            var methodName = "";
+
             var user = this.instances
                 .PasswordHasher
                 .CreateUser(USERNAME, PASSWORD);
+            var input = GetAuthenticateInput(USERNAME, PASSWORD);
 
             this.instances.Users.Add(user);
 
             // Act
-            this.instances.Authenticator.Authenticated += (_, user) =>
+            this.instances.Authenticator.Authenticated += (_, usedInput, user) =>
             {
-                Console.WriteLine(user.Id);
                 triggered = true;
+                methodName = usedInput.MethodName;
             };
             this.instances
                 .Authenticator
-                .TryAuthenticate(GetAuthenticateInput(USERNAME, PASSWORD));
+                .TryAuthenticate(input);
 
             // Assert
             Assert.IsTrue(triggered);
+            Assert.AreEqual(input.MethodName, methodName);
             Assert.Pass();
         }
 
@@ -56,20 +59,25 @@ namespace Facilis.UsersManagement.Tests
         {
             // Arrange
             var failureType = LoginFailureTypes.None;
+            var methodName = "";
+
+            var input = GetAuthenticateInput(USERNAME, PASSWORD);
 
             // Act
             this.instances
                 .Authenticator
-                .AuthenticateFailed += (_, type, __) =>
+                .AuthenticateFailed += (_, usedInput, type) =>
                 {
                     failureType = type;
+                    methodName = usedInput.MethodName;
                 };
             this.instances
                 .Authenticator
-                .TryAuthenticate(GetAuthenticateInput(USERNAME, PASSWORD));
+                .TryAuthenticate(input);
 
             // Assert
             Assert.AreNotEqual(LoginFailureTypes.None, failureType);
+            Assert.AreEqual(input.MethodName, methodName);
             Assert.Pass();
         }
 
