@@ -16,6 +16,7 @@ namespace Facilis.UsersManagement.Abstractions
 
         public string MethodName => METHOD_NAME;
         public string Identifier { get => this.TokenId; set => throw new NotImplementedException(); }
+        public string UserId { get; set; }
 
         public string TokenId { get; set; }
         public string Value { get; set; }
