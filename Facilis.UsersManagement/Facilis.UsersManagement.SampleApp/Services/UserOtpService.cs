@@ -35,7 +35,7 @@ namespace Facilis.UsersManagement.SampleApp.Services
         public string? GetGeneratedTokenId(string username, out string? token)
         {
             var user = this.users
-                .WhereAll(user => user.Username == username)
+                .WhereAll(user => user.Username.ToLower() == username.ToLower())
                 .FirstOrDefault();
 
             token = this.GetRandomizedToken();
@@ -48,6 +48,8 @@ namespace Facilis.UsersManagement.SampleApp.Services
                 HashedPassword = hashedToken.HashedPassword,
                 PasswordSalt = hashedToken.PasswordSalt,
                 PasswordIterated = hashedToken.PasswordIterated,
+
+                UserId = user.Id,
                 ExpiredAtUtc = DateTime.UtcNow.AddMinutes(EXPIRY_IN_MINUTES),
             };
 
