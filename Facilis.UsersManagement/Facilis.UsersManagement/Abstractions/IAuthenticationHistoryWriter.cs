@@ -38,7 +38,7 @@ namespace Facilis.UsersManagement.Abstractions
 
         private void OnAuthenticateFailed(object sender, IAuthenticateInput input, LoginFailureTypes type)
         {
-            this.histories.Add(this.ToHistory(null, input, type));
+            this.histories.Add(this.ToHistory(input.UserId, input, type));
         }
 
         private AuthenticationHistory ToHistory(

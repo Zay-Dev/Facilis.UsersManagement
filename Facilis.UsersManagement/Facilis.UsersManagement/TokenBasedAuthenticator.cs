@@ -50,6 +50,8 @@ namespace Facilis.UsersManagement
             user = this.users.FindById(input.UserToken.UserId);
             if (user == null) return LoginFailureTypes.UserNotFound;
 
+            input.UserId = user.Id;
+
             if (input.UserToken.ExpiredAtUtc <= DateTime.UtcNow)
             {
                 return LoginFailureTypes.TokenIsExpired;
