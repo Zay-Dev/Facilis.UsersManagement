@@ -1,6 +1,7 @@
 using Facilis.Core.Abstractions;
 using Facilis.Core.EntityFrameworkCore.Abstractions;
 using Facilis.Extensions.EntityFrameworkCore;
+using Facilis.UsersManagement;
 using Facilis.UsersManagement.Abstractions;
 using Facilis.UsersManagement.Helpers;
 using Facilis.UsersManagement.SampleApp;

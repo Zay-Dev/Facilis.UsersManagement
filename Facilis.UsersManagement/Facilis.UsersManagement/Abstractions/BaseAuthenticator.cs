@@ -1,8 +1,6 @@
-﻿using Facilis.Core.Abstractions;
-using Facilis.Core.Enums;
+﻿using Facilis.Core.Enums;
 using Facilis.UsersManagement.Enums;
 using System;
-using System.Linq;
 
 namespace Facilis.UsersManagement.Abstractions
 {
@@ -17,22 +15,18 @@ namespace Facilis.UsersManagement.Abstractions
 
         public IAuthenticatedResult<TUser> TryAuthenticate(TInput input)
         {
-            var user = this.FindUser(input);
-            var failure = this.ValidateUserStatus(user);
-
+            var failure = this.TryFindUser(input, out var user);
             if (failure == LoginFailureTypes.None)
             {
-                failure = this.Authenticate(user, input);
+                failure = this.ValidateUserStatus(user);
+
+                if (failure == LoginFailureTypes.None)
+                {
+                    failure = this.Authenticate(user, input);
+                }
             }
 
-            if (failure != LoginFailureTypes.None)
-            {
-                this.OnAuthenticateFailed(input, failure);
-            }
-            else
-            {
-                this.OnAuthenticated(input, user);
-            }
+            this.InvokePostEvent(failure, input, user);
 
             return new AuthenticatedResult<TUser>()
             {
@@ -42,7 +36,7 @@ namespace Facilis.UsersManagement.Abstractions
             };
         }
 
-        protected abstract TUser FindUser(TInput input);
+        protected abstract LoginFailureTypes TryFindUser(TInput input, out TUser user);
 
         protected abstract LoginFailureTypes Authenticate(TUser user, TInput input);
 
@@ -77,41 +71,22 @@ namespace Facilis.UsersManagement.Abstractions
             this.AuthenticateFailed?.Invoke(this, input, type);
         }
 
+        private void InvokePostEvent(LoginFailureTypes failure, TInput input, TUser user)
+        {
+            if (failure != LoginFailureTypes.None)
+            {
+                this.OnAuthenticateFailed(input, failure);
+            }
+            else
+            {
+                this.OnAuthenticated(input, user);
+            }
+        }
+
         private static bool IsLocked(TUser user)
         {
             return user.LockedUntilUtc.HasValue &&
                 user.LockedUntilUtc > DateTime.UtcNow;
-        }
-    }
-
-    public class PasswordBasedAuthenticator<TUser> : BaseAuthenticator<IPasswordBase, TUser>
-        where TUser : IUser
-    {
-        private IEntities<TUser> entities { get; }
-        private IPasswordHasher passwordHasher { get; }
-
-        #region Constructor(s)
-
-        public PasswordBasedAuthenticator(IEntities<TUser> entities, IPasswordHasher passwordHasher)
-        {
-            this.entities = entities;
-            this.passwordHasher = passwordHasher;
-        }
-
-        #endregion Constructor(s)
-
-        protected override TUser FindUser(IPasswordBase input)
-        {
-            return this.entities.Rows.FirstOrDefault(entity =>
-                entity.Username.ToLower() == input.Username.ToLower()
-            );
-        }
-
-        protected override LoginFailureTypes Authenticate(TUser user, IPasswordBase input)
-        {
-            return this.passwordHasher.Verify(user, input.Password) ?
-                LoginFailureTypes.None :
-                LoginFailureTypes.PasswordMismatch;
         }
     }
 }

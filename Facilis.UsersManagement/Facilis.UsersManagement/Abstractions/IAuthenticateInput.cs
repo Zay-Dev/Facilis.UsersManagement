@@ -2,6 +2,6 @@
 {
     public interface IAuthenticateInput
     {
-        public string MethodName { get; }
+        string MethodName { get; }
     }
 }

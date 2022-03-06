@@ -8,7 +8,7 @@ namespace Facilis.UsersManagement.Abstractions
 
         IUser UncastedUser { get; }
 
-        public bool HasFailure();
+        bool HasFailure();
     }
 
     public interface IAuthenticatedResult<T> : IAuthenticatedResult
