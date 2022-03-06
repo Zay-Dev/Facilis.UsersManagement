@@ -13,6 +13,8 @@ namespace Facilis.UsersManagement.Tests
 
         public DbContext Context { get; }
         public IEntities<User> Users { get; }
+        public IEntities<UserToken> UserTokens { get; }
+
         public IAuthenticator<IPasswordBase, User> Authenticator { get; }
 
         #region Constructor(s)
@@ -23,6 +25,8 @@ namespace Facilis.UsersManagement.Tests
 
             this.Context = nameof(Facilis).InMemoryContext<AppDbContext>();
             this.Users = new Entities<User>(this.Context);
+            this.UserTokens = new Entities<UserToken>(this.Context);
+
             this.Authenticator = new PasswordBasedAuthenticator<User>(
                 this.Users,
                 this.PasswordHasher

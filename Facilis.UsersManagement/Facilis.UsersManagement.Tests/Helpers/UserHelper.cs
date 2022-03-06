@@ -22,5 +22,25 @@ namespace Facilis.UsersManagement.Tests.Helpers
                 PasswordIterated = hashed.PasswordIterated,
             };
         }
+
+        public static UserToken CreateUserToken(
+            this IPasswordHasher passwordHasher,
+            IUser user
+        )
+        {
+            const string TOKEN = nameof(TOKEN);
+
+            var hashed = passwordHasher.Hash(TOKEN);
+
+            return new()
+            {
+                HashingMethod = hashed.HashingMethod,
+                HashedPassword = hashed.HashedPassword,
+                PasswordSalt = hashed.PasswordSalt,
+                PasswordIterated = hashed.PasswordIterated,
+
+                UserId = user.Id,
+            };
+        }
     }
 }
