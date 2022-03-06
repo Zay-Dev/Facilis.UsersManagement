@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Facilis.UsersManagement.Abstractions
+﻿namespace Facilis.UsersManagement.Abstractions
 {
     public interface ITokenBase : IAuthenticateInput
     {
