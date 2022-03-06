@@ -1,4 +1,6 @@
-﻿namespace Facilis.UsersManagement.Abstractions
+﻿using System.Text.Json.Serialization;
+
+namespace Facilis.UsersManagement.Abstractions
 {
     public interface IPasswordBase : IAuthenticateInput
     {
@@ -12,6 +14,8 @@
 
         public string MethodName => METHOD_NAME;
         public string Username { get; set; }
+
+        [JsonIgnore]
         public string Password { get; set; }
     }
 }
