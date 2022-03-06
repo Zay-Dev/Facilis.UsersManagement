@@ -52,7 +52,6 @@ namespace Facilis.UsersManagement.Abstractions
                 UserId = userId,
                 Failure = type,
                 MethodName = input.MethodName,
-                Identifier = input.Identifier,
                 Information = JsonSerializer.Serialize(input, input.GetType()),
             };
 

@@ -15,7 +15,6 @@ namespace Facilis.UsersManagement.Abstractions
         public const string METHOD_NAME = nameof(TokenBase);
 
         public string MethodName => METHOD_NAME;
-        public string Identifier { get => this.TokenId; set => throw new NotImplementedException(); }
         public string UserId { get; set; }
 
         public string TokenId { get; set; }
