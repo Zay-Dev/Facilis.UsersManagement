@@ -6,6 +6,7 @@ namespace Facilis.UsersManagement.Tests
     public class AppDbContext : DbContext
     {
         public DbSet<User> Users { get; set; }
+        public DbSet<UserToken> UserTokens { get; set; }
 
         #region Constructor(s)
 

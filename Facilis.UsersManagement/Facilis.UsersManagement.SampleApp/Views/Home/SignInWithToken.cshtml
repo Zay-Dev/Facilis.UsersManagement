@@ -1,0 +1,117 @@
+﻿@using Facilis.UsersManagement.SampleApp.Helpers
+
+<script type="text/javascript">
+    const data = (() => {
+        return {
+            username: '',
+            tokenId: '',
+            token: '',
+
+            init: function () { that = this },
+            getToken: () => {
+                that.tokenId = '';
+
+                cssLoader.show()
+                    .then(() => axios.get(`/api/user-tokens/${that.username}`))
+                    .then(response => {
+                        that.tokenId = response.data.id;
+                        that.token = response.data.token;
+                    })
+                    .then(cssLoader.hide);
+            },
+        };
+    })();
+</script>
+
+<div class="vh-100 d-flex align-items-center justify-content-center"
+     x-data="data">
+    <div class="card p-4">
+        <div class="mb-3">
+            <h1 class="fs-3">Facilis Users Management</h1>
+            <h2 class="fs-5">Sample App</h2>
+        </div>
+
+        <form method="post">
+            <input name="tokenId" hidden x-model="tokenId" />
+
+            <div class="mb-3">
+                <div class="form-group mb-2">
+                    <label for="username">Username</label>
+                    <input placeholder="Username"
+                           class="form-control"
+                           x-model="username" />
+
+                    <template x-if="token && !tokenId">
+                        <div class="text-danger">
+                            User not found
+                        </div>
+                    </template>
+
+                    <template x-if="!tokenId">
+                        <div class="text-end mt-2">
+                            <button class="btn btn-primary"
+                                    type="button"
+                                    x-on:click="getToken()"
+                                    x-bind:disabled="!username">
+                                Generate &amp; send token
+                            </button>
+                        </div>
+                    </template>
+                </div>
+
+                <template x-if="tokenId">
+                    <div class="form-group mb-2">
+                        <label for="password">Token</label>
+                        <input name="value" required
+                               placeholder="Token (4 digits)"
+                               class="form-control" />
+                    </div>
+                </template>
+            </div>
+
+            <div x-show="tokenId">
+                <hr />
+
+                <div>
+                    Token: <code x-text="token"></code>
+                </div>
+            </div>
+
+            <hr />
+
+            <div>
+                <div>
+                    Admin Username:
+                    <code>@DbContextHelper.ADMIN.ToLower()</code>
+                </div>
+
+                <div>
+                    Username:
+                    <code>@DbContextHelper.USERNAME.ToLower()</code>
+                </div>
+            </div>
+
+            <hr />
+
+            @if (((bool?)TempData["IsRetry"]) == true)
+            {
+                <div class="mb-3">
+                    <span class="text-danger">
+                        Incorrect username or password
+                        (@DateTime.UtcNow.ToString("HH:mm:ss"))
+                    </span>
+                </div>
+            }
+
+            <div class="d-flex justify-content-between">
+                <a href="~/sign-in" class="btn btn-secondary">Use password</a>
+
+                <button type="submit"
+                        class="btn btn-primary"
+                        x-bind:disabled="!tokenId">
+                    Login
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

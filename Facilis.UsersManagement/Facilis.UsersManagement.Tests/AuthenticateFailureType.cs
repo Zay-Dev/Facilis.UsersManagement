@@ -1,4 +1,5 @@
 using Facilis.Core.Enums;
+using Facilis.UsersManagement.Abstractions;
 using Facilis.UsersManagement.Enums;
 using Facilis.UsersManagement.Tests.Helpers;
 using NUnit.Framework;
@@ -36,12 +37,13 @@ namespace Facilis.UsersManagement.Tests
             this.instances.Users.Add(user);
 
             // Act
-            var failureType = this.instances
+            var failure = this.instances
                 .Authenticator
-                .TryAuthenticate(USERNAME, PASSWORD, out var _);
+                .TryAuthenticate(GetAuthenticateInput(USERNAME, PASSWORD))
+                .Failure;
 
             // Assert
-            Assert.AreEqual(LoginFailureTypes.None, failureType);
+            Assert.AreEqual(LoginFailureTypes.None, failure);
             Assert.Pass();
         }
 
@@ -51,12 +53,13 @@ namespace Facilis.UsersManagement.Tests
             // Arrange
 
             // Act
-            var failureType = this.instances
+            var failure = this.instances
                 .Authenticator
-                .TryAuthenticate(USERNAME, PASSWORD, out var _);
+                .TryAuthenticate(GetAuthenticateInput(USERNAME, PASSWORD))
+                .Failure;
 
             // Assert
-            Assert.AreEqual(LoginFailureTypes.UserNotFound, failureType);
+            Assert.AreEqual(LoginFailureTypes.UserNotFound, failure);
             Assert.Pass();
         }
 
@@ -72,12 +75,13 @@ namespace Facilis.UsersManagement.Tests
             this.instances.Users.Add(user);
 
             // Act
-            var failureType = this.instances
+            var failure = this.instances
                 .Authenticator
-                .TryAuthenticate(USERNAME, PASSWORD, out var _);
+                .TryAuthenticate(GetAuthenticateInput(USERNAME, PASSWORD))
+                .Failure;
 
             // Assert
-            Assert.AreEqual(LoginFailureTypes.DisabledUser, failureType);
+            Assert.AreEqual(LoginFailureTypes.DisabledUser, failure);
             Assert.Pass();
         }
 
@@ -93,12 +97,13 @@ namespace Facilis.UsersManagement.Tests
             this.instances.Users.Add(user);
 
             // Act
-            var failureType = this.instances
+            var failure = this.instances
                 .Authenticator
-                .TryAuthenticate(USERNAME, PASSWORD, out var _);
+                .TryAuthenticate(GetAuthenticateInput(USERNAME, PASSWORD))
+                .Failure;
 
             // Assert
-            Assert.AreEqual(LoginFailureTypes.LockedUser, failureType);
+            Assert.AreEqual(LoginFailureTypes.LockedUser, failure);
             Assert.Pass();
         }
 
@@ -112,13 +117,23 @@ namespace Facilis.UsersManagement.Tests
             this.instances.Users.Add(user);
 
             // Act
-            var failureType = this.instances
+            var failure = this.instances
                 .Authenticator
-                .TryAuthenticate(USERNAME, "", out var _);
+                .TryAuthenticate(GetAuthenticateInput(USERNAME, ""))
+                .Failure;
 
             // Assert
-            Assert.AreEqual(LoginFailureTypes.PasswordMismatch, failureType);
+            Assert.AreEqual(LoginFailureTypes.PasswordMismatch, failure);
             Assert.Pass();
+        }
+
+        private static PasswordBase GetAuthenticateInput(string username, string password)
+        {
+            return new()
+            {
+                Username = username,
+                Password = password,
+            };
         }
     }
 }

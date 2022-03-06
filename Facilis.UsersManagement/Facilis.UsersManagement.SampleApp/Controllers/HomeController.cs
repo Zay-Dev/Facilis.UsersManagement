@@ -1,6 +1,5 @@
 ﻿using Facilis.Core.Abstractions;
 using Facilis.UsersManagement.Abstractions;
-using Facilis.UsersManagement.Enums;
 using Facilis.UsersManagement.Helpers;
 using Facilis.UsersManagement.SampleApp.Enums;
 using Microsoft.AspNetCore.Authentication;
@@ -14,17 +13,17 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
     [Authorize]
     public class HomeController : Controller
     {
-        private IAuthenticator<User> authenticator { get; }
+        private IAuthenticator<IPasswordBase, User> passwordAuthenticator { get; }
         private IEntities<User> users { get; }
 
         #region Constructor(s)
 
         public HomeController(
-            IAuthenticator<User> authenticator,
+            IAuthenticator<IPasswordBase, User> passwordAuthenticator,
             IEntities<User> users
         )
         {
-            this.authenticator = authenticator;
+            this.passwordAuthenticator = passwordAuthenticator;
             this.users = users;
         }
 
@@ -59,27 +58,62 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
         }
 
         [AllowAnonymous]
-        [Route("~/sign-in")]
+        [Route("~/sign-in/otp")]
+        public IActionResult SignInWithToken()
+        {
+            return View();
+        }
+
         [HttpPost]
+        [AllowAnonymous]
+        [Route("~/sign-in/otp")]
+        public async Task<IActionResult> SignInWithToken(
+            [FromServices] IAuthenticator<ITokenBase, User> authenticator,
+            string tokenId,
+            string value
+        )
+        {
+            var authenticated = authenticator
+                .TryAuthenticate(new TokenBase()
+                {
+                    TokenId = tokenId,
+                    Value = value ?? ""
+                });
+
+            return await GetActionResultAsync("", authenticated);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("~/sign-in")]
         public async Task<IActionResult> SignIn(string username, string password)
         {
-            var failureType = this.authenticator
-                .TryAuthenticate(username, password, out var user);
+            var authenticated = this.passwordAuthenticator
+                .TryAuthenticate(new PasswordBase()
+                {
+                    Username = username,
+                    Password = password,
+                });
 
-            if (failureType != LoginFailureTypes.None)
-            {
-                this.SaveFailureTempData(username);
-                return RedirectToAction(nameof(SignIn));
-            }
-
-            await this.SignInAsync(user);
-            return Redirect("~/");
+            return await GetActionResultAsync(username, authenticated);
         }
 
         [Route("~/sign-out")]
         public async Task<IActionResult> SignOutAsync()
         {
             await this.HttpContext.SignOutAsync();
+            return Redirect("~/");
+        }
+
+        private async Task<IActionResult> GetActionResultAsync(string username, IAuthenticatedResult<User> authenticated)
+        {
+            if (authenticated.HasFailure())
+            {
+                this.SaveFailureTempData(username);
+                return RedirectToAction(nameof(SignIn));
+            }
+
+            await this.SignInAsync(authenticated.User);
             return Redirect("~/");
         }
 

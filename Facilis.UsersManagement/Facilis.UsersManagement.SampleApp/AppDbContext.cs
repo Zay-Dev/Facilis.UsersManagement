@@ -8,6 +8,7 @@ namespace Facilis.UsersManagement.SampleApp
     public class AppDbContext : DbContext
     {
         public DbSet<User> Users { get; set; }
+        public DbSet<UserToken> UserTokens { get; set; }
         public DbSet<ExtendedAttribute> ExtendedAttributes { get; set; }
 
         #region Constructor(s)

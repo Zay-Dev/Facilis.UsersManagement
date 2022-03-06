@@ -6,22 +6,24 @@ namespace Facilis.UsersManagement.Helpers
 {
     public static class InjectionHelper
     {
-        public static IServiceCollection AddAuthenticator<TAuthenticator>(
-            this IServiceCollection services
-        ) where TAuthenticator : class, IAuthenticator
-        {
-            return services.AddScoped<IAuthenticator, TAuthenticator>();
-        }
-
-        public static IServiceCollection AddAuthenticator<TAuthenticator, TUser>(
+        public static IServiceCollection AddPasswordBased<TAuthenticator, TUser>(
             this IServiceCollection services
         )
-            where TAuthenticator : class, IAuthenticator<TUser>
             where TUser : IUser
+            where TAuthenticator : class, IAuthenticator<IPasswordBase, TUser>
         {
             return services
-                .AddScoped<IAuthenticator, TAuthenticator>()
-                .AddScoped<IAuthenticator<TUser>, TAuthenticator>();
+                .AddScoped<IAuthenticator<IPasswordBase, TUser>, TAuthenticator>();
+        }
+
+        public static IServiceCollection AddTokenBased<TAuthenticator, TUser>(
+            this IServiceCollection services
+        )
+            where TUser : IUser
+            where TAuthenticator : class, IAuthenticator<ITokenBase, TUser>
+        {
+            return services
+                .AddScoped<IAuthenticator<ITokenBase, TUser>, TAuthenticator>();
         }
 
         public static IServiceCollection AddDefaultPasswordHasher(
