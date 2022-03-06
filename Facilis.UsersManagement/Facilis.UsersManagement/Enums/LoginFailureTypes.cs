@@ -7,5 +7,8 @@
         DisabledUser,
         LockedUser,
         PasswordMismatch,
+        TokenMismatch,
+        TokenNotFound,
+        TokenIsExpired,
     }
 }
