@@ -27,7 +27,7 @@ static void ConfigureService(WebApplicationBuilder builder)
     builder.Services
         .AddHttpContextAccessor()
         .AddDefaultPasswordHasher()
-        .AddAuthenticator<Authenticator<User>, User>()
+        .AddAuthenticator<PasswordBasedAuthenticator<User>, User>()
 
         .AddScoped<IEntityStampsBinder>(provider => new EntityStampsBinder()
         {

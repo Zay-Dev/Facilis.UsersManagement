@@ -13,17 +13,17 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
     [Authorize]
     public class HomeController : Controller
     {
-        private IAuthenticator<User> authenticator { get; }
+        private IAuthenticator<IPasswordBase, User> passwordAuthenticator { get; }
         private IEntities<User> users { get; }
 
         #region Constructor(s)
 
         public HomeController(
-            IAuthenticator<User> authenticator,
+            IAuthenticator<IPasswordBase, User> passwordAuthenticator,
             IEntities<User> users
         )
         {
-            this.authenticator = authenticator;
+            this.passwordAuthenticator = passwordAuthenticator;
             this.users = users;
         }
 
@@ -62,7 +62,7 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
         [HttpPost]
         public async Task<IActionResult> SignIn(string username, string password)
         {
-            var authenticated = this.authenticator
+            var authenticated = this.passwordAuthenticator
                 .TryAuthenticate(new PasswordBase()
                 {
                     Username = username,
