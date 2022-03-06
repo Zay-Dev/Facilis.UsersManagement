@@ -12,7 +12,7 @@ namespace Facilis.UsersManagement.Abstractions
 
     public class AuthenticationHistoryWriter : IAuthenticationHistoryWriter
     {
-        private IEntitiesWithId<IAuthenticationHistory> histories { get; }
+        private IEntitiesWithId<AuthenticationHistory> histories { get; }
         private IEntityStampsBinder stampsBinder { get; }
 
         public AuthenticatedEventHandler Authenticated => this.OnAuthenticated;
@@ -21,7 +21,7 @@ namespace Facilis.UsersManagement.Abstractions
         #region Constructor(s)
 
         public AuthenticationHistoryWriter(
-            IEntitiesWithId<IAuthenticationHistory> histories,
+            IEntitiesWithId<AuthenticationHistory> histories,
             IEntityStampsBinder stampsBinder
         )
         {
@@ -51,7 +51,7 @@ namespace Facilis.UsersManagement.Abstractions
             {
                 Failure = type,
                 MethodName = input.MethodName,
-                Information = JsonSerializer.Serialize(input)
+                Information = JsonSerializer.Serialize(input, input.GetType())
             };
 
             this.stampsBinder.BindCreatedBySystem(history);
