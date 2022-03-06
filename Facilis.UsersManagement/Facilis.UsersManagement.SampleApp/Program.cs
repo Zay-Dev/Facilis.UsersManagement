@@ -6,6 +6,7 @@ using Facilis.UsersManagement.Abstractions;
 using Facilis.UsersManagement.Helpers;
 using Facilis.UsersManagement.SampleApp;
 using Facilis.UsersManagement.SampleApp.Helpers;
+using Facilis.UsersManagement.SampleApp.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -28,7 +29,8 @@ static void ConfigureService(WebApplicationBuilder builder)
     builder.Services
         .AddHttpContextAccessor()
         .AddDefaultPasswordHasher()
-        .AddAuthenticator<PasswordBasedAuthenticator<User>, User>()
+        .AddPasswordBased<PasswordBasedAuthenticator<User>, User>()
+        .AddTokenBased<TokenBasedAuthenticator<UserToken, User>, User>()
 
         .AddScoped<IEntityStampsBinder>(provider => new EntityStampsBinder()
         {
@@ -44,7 +46,9 @@ static void ConfigureService(WebApplicationBuilder builder)
             option.UseSqlite("Data Source=./local.db;")
         )
         .AddDefaultEntities()
-        .UseProfileAttributesBuilder<AppDbContext, ProfileAttributesBinder>();
+        .UseProfileAttributesBuilder<AppDbContext, ProfileAttributesBinder>()
+
+        .AddScoped<UserOtpService>();
 }
 
 static void Configure(WebApplication app)
