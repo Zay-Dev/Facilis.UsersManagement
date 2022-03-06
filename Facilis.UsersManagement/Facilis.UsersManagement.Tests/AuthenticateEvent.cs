@@ -43,7 +43,7 @@ namespace Facilis.UsersManagement.Tests
             };
             this.instances
                 .Authenticator
-                .TryAuthenticate(USERNAME, PASSWORD, out var _);
+                .TryAuthenticate(USERNAME, PASSWORD);
 
             // Assert
             Assert.IsTrue(triggered);
@@ -66,7 +66,7 @@ namespace Facilis.UsersManagement.Tests
                 };
             this.instances
                 .Authenticator
-                .TryAuthenticate(USERNAME, PASSWORD, out var _);
+                .TryAuthenticate(USERNAME, PASSWORD);
 
             // Assert
             Assert.AreNotEqual(LoginFailureTypes.None, failureType);

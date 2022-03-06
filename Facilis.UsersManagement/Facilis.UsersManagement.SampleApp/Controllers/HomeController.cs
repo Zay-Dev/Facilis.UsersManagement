@@ -1,6 +1,5 @@
 ﻿using Facilis.Core.Abstractions;
 using Facilis.UsersManagement.Abstractions;
-using Facilis.UsersManagement.Enums;
 using Facilis.UsersManagement.Helpers;
 using Facilis.UsersManagement.SampleApp.Enums;
 using Microsoft.AspNetCore.Authentication;
@@ -63,16 +62,16 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
         [HttpPost]
         public async Task<IActionResult> SignIn(string username, string password)
         {
-            var failureType = this.authenticator
-                .TryAuthenticate(username, password, out var user);
+            var authenticated = this.authenticator
+                .TryAuthenticate(username, password);
 
-            if (failureType != LoginFailureTypes.None)
+            if (authenticated.HasFailure())
             {
                 this.SaveFailureTempData(username);
                 return RedirectToAction(nameof(SignIn));
             }
 
-            await this.SignInAsync(user);
+            await this.SignInAsync(authenticated.User);
             return Redirect("~/");
         }
 

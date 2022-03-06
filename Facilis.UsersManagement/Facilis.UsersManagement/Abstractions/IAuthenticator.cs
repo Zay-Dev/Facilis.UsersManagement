@@ -16,15 +16,15 @@ namespace Facilis.UsersManagement.Abstractions
 
         event AuthenticateFailedEventHandler AuthenticateFailed;
 
-        LoginFailureTypes TryAuthenticate(string username, string password, out IUser user);
+        IAuthenticatedResult TryAuthenticate(string username, string password);
     }
 
     public interface IAuthenticator<T> : IAuthenticator where T : IUser
     {
-        LoginFailureTypes TryAuthenticate(string username, string password, out T user);
+        new IAuthenticatedResult<T> TryAuthenticate(string username, string password);
     }
 
-    public class Authenticator<T> : IAuthenticator, IAuthenticator<T>
+    public class Authenticator<T> : IAuthenticator<T>
         where T : IUser
     {
         private IEntities<T> entities { get; }
@@ -44,18 +44,15 @@ namespace Facilis.UsersManagement.Abstractions
 
         #endregion Constructor(s)
 
-        public LoginFailureTypes TryAuthenticate(string username, string password, out IUser user)
+        IAuthenticatedResult IAuthenticator.TryAuthenticate(string username, string password)
         {
-            var failureType = this.TryAuthenticate(username, password, out T concreteUser);
-            user = concreteUser;
-
-            return failureType;
+            return this.TryAuthenticate(username, password);
         }
 
-        public LoginFailureTypes TryAuthenticate(string username, string password, out T user)
+        public IAuthenticatedResult<T> TryAuthenticate(string username, string password)
         {
             var failureType = LoginFailureTypes.None;
-            user = this.FindByUsername(username);
+            var user = this.FindByUsername(username);
 
             if (user == null)
             {
@@ -83,7 +80,12 @@ namespace Facilis.UsersManagement.Abstractions
                 this.OnAuthenticated(user);
             }
 
-            return failureType;
+            return new AuthenticatedResult<T>()
+            {
+                Failure = failureType,
+                UncastedUser = user,
+                User = user,
+            };
         }
 
         protected virtual void OnAuthenticated(T user)
