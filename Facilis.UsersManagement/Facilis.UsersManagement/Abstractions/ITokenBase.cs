@@ -13,6 +13,9 @@
         public const string METHOD_NAME = nameof(TokenBase);
 
         public string MethodName => METHOD_NAME;
+        public string IdentifierType { get; set; }
+        public string Identifier { get; set; }
+
         public string TokenId { get; set; }
         public string Value { get; set; }
 
