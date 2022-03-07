@@ -1,5 +1,4 @@
 using Facilis.Core.Abstractions;
-using Facilis.Core.EntityFrameworkCore.Abstractions;
 using Facilis.Extensions.EntityFrameworkCore;
 using Facilis.UsersManagement;
 using Facilis.UsersManagement.Abstractions;
@@ -30,6 +29,7 @@ static void ConfigureService(WebApplicationBuilder builder)
         .AddHttpContextAccessor()
         .AddDefaultPasswordHasher()
         .AddDefaultAuthenticationHistories()
+        .AddDefaultProfileAttributesBinder()
 
         .AddPasswordBased<PasswordBasedAuthenticator<User>, User>()
         .AddTokenBased<TokenBasedAuthenticator<UserToken, User>, User>()
@@ -37,18 +37,16 @@ static void ConfigureService(WebApplicationBuilder builder)
         .AddScoped<IEntityStampsBinder>(provider => new EntityStampsBinder()
         {
             SystemOperatorIdentifier = nameof(System),
-            CurrentUserIdentifier = provider.GetService<IHttpContextAccessor>()
-                .HttpContext?
-                .User?
-                .GetIdentifier()?
-                .Value
+            CurrentUserIdentifier = provider
+                .GetRequiredService<IHttpContextAccessor>()
+                .HttpContext?.User?.GetIdentifier()?.Value
         })
 
         .AddDbContext<AppDbContext>(option =>
             option.UseSqlite("Data Source=./local.db;")
         )
+        .AddDbContext<DbContext, AppDbContext>()
         .AddDefaultEntities()
-        .UseProfileAttributesBuilder<AppDbContext, ProfileAttributesBinder>()
 
         .AddScoped<UserOtpService>();
 }
@@ -73,6 +71,13 @@ static void Configure(WebApplication app)
 
     app.UseAuthentication();
     app.UseAuthorization();
+
+    app.Use(async (context, next) => await context
+        .RequestServices.UseProfileAttributesBinder(next)
+    );
+    app.Use(async (context, next) => await context.RequestServices
+        .UseAuthenticationHistories(next)
+    );
 
     app.MapControllerRoute(
         name: "default",

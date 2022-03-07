@@ -1,6 +1,9 @@
 ﻿using Facilis.Core.Abstractions;
 using Facilis.UsersManagement.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Facilis.UsersManagement.Helpers
 {
@@ -38,6 +41,30 @@ namespace Facilis.UsersManagement.Helpers
             return services.AddScoped<IAuthenticationHistoryWriter, AuthenticationHistoryWriter>();
         }
 
+        public static void UseAuthenticationHistories(
+            this IEnumerable<IAuthenticator> authenticators,
+            IAuthenticationHistoryWriter writer
+        )
+        {
+            foreach (var authenticator in authenticators)
+            {
+                authenticator.Authenticated += writer.OnAuthenticated;
+                authenticator.AuthenticateFailed += writer.OnAuthenticateFailed;
+            }
+        }
+
+        public static async Task UseAuthenticationHistories(
+            this IServiceProvider provider,
+            Func<Task> next
+        )
+        {
+            provider.GetRequiredService<IEnumerable<IAuthenticator>>()
+                .UseAuthenticationHistories(provider
+                    .GetRequiredService<IAuthenticationHistoryWriter>()
+                );
+            await next();
+        }
+
         private static IServiceCollection AddAuthenticator<TInputService, TAuthenticator, TUser>(
             this IServiceCollection services
         )
@@ -46,26 +73,10 @@ namespace Facilis.UsersManagement.Helpers
             where TAuthenticator : class, IAuthenticator<TInputService, TUser>
         {
             return services
-                .AddScoped<IAuthenticator<TInputService, TUser>>(provider =>
-                {
-                    var authenticator = ActivatorUtilities
-                        .CreateInstance<TAuthenticator>(provider);
-                    var writer = provider.GetService<IAuthenticationHistoryWriter>();
-                    if (writer != null) authenticator.AddDefaultHistory(writer);
-
-                    return authenticator;
-                });
-        }
-
-        private static void AddDefaultHistory<TInput, TUser>(
-            this IAuthenticator<TInput, TUser> authenticator,
-            IAuthenticationHistoryWriter writer
-        )
-            where TInput : IAuthenticateInput
-            where TUser : IUser
-        {
-            authenticator.Authenticated += writer.Authenticated;
-            authenticator.AuthenticateFailed += writer.AuthenticateFailed;
+                .AddScoped<IAuthenticator<TInputService, TUser>, TAuthenticator>()
+                .AddScoped<IAuthenticator>(provider =>
+                    provider.GetRequiredService<IAuthenticator<TInputService, TUser>>()
+                );
         }
     }
 }

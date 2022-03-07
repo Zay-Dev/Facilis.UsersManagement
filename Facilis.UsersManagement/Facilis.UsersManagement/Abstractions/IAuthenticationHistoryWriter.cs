@@ -6,17 +6,15 @@ namespace Facilis.UsersManagement.Abstractions
 {
     public interface IAuthenticationHistoryWriter
     {
-        AuthenticatedEventHandler Authenticated { get; }
-        AuthenticateFailedEventHandler AuthenticateFailed { get; }
+        void OnAuthenticated(object sender, IAuthenticateInput input, IUser user);
+
+        void OnAuthenticateFailed(object sender, IAuthenticateInput input, LoginFailureTypes type);
     }
 
     public class AuthenticationHistoryWriter : IAuthenticationHistoryWriter
     {
         private IEntitiesWithId<AuthenticationHistory> histories { get; }
         private IEntityStampsBinder stampsBinder { get; }
-
-        public AuthenticatedEventHandler Authenticated => this.OnAuthenticated;
-        public AuthenticateFailedEventHandler AuthenticateFailed => this.OnAuthenticateFailed;
 
         #region Constructor(s)
 
@@ -31,12 +29,12 @@ namespace Facilis.UsersManagement.Abstractions
 
         #endregion Constructor(s)
 
-        private void OnAuthenticated(object sender, IAuthenticateInput input, IUser user)
+        public void OnAuthenticated(object sender, IAuthenticateInput input, IUser user)
         {
             this.histories.Add(this.ToHistory(user.Id, input, LoginFailureTypes.None));
         }
 
-        private void OnAuthenticateFailed(object sender, IAuthenticateInput input, LoginFailureTypes type)
+        public void OnAuthenticateFailed(object sender, IAuthenticateInput input, LoginFailureTypes type)
         {
             this.histories.Add(this.ToHistory(input.UserId, input, type));
         }

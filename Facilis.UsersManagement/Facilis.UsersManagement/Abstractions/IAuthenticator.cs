@@ -6,14 +6,17 @@ namespace Facilis.UsersManagement.Abstractions
 
     public delegate void AuthenticateFailedEventHandler(object sender, IAuthenticateInput input, LoginFailureTypes type);
 
-    public interface IAuthenticator<TInput, TUser>
-        where TInput : IAuthenticateInput
-        where TUser : IUser
+    public interface IAuthenticator
     {
         event AuthenticatedEventHandler Authenticated;
 
         event AuthenticateFailedEventHandler AuthenticateFailed;
+    }
 
+    public interface IAuthenticator<TInput, TUser> : IAuthenticator
+        where TInput : IAuthenticateInput
+        where TUser : IUser
+    {
         IAuthenticatedResult<TUser> TryAuthenticate(TInput input);
     }
 }
