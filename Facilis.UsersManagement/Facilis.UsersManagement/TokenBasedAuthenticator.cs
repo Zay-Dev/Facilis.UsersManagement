@@ -43,8 +43,7 @@ namespace Facilis.UsersManagement
         {
             user = default;
 
-            input.UserToken = this.tokens.FindById(input.TokenId);
-
+            input.UserToken = this.tokens.FindEnabledById(input.TokenId);
             if (input.UserToken == null) return LoginFailureTypes.TokenNotFound;
 
             user = this.users.FindById(input.UserToken.UserId);
