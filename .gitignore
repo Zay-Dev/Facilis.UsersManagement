@@ -366,3 +366,6 @@ FodyWeavers.xsd
 **/*/*.db
 **/*/*.db-shm
 **/*/*.db-wal
+
+# Firebase private key
+sampleapp-f7318-firebase-adminsdk-v9m13-e73fb13baf.json

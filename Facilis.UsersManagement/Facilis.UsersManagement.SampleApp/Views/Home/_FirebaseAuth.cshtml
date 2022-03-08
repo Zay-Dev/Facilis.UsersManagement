@@ -1,0 +1,55 @@
+﻿<script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script>
+<script type="text/javascript">
+    const watchFirebase = () => {
+        thatFirebase.$watch('accessToken', () => {
+            cssLoader.show();
+            document.getElementById('firebase-form').submit();
+        });
+    };
+    let thatFirebase;
+</script>
+
+<script type="module">
+    import 'https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js'
+
+    firebase.initializeApp({
+        apiKey: "AIzaSyAaXbN0cr4kSO0APy_Q1lPHpRRl9yw0BVE",
+        authDomain: "sampleapp-f7318.firebaseapp.com",
+        projectId: "sampleapp-f7318",
+        storageBucket: "sampleapp-f7318.appspot.com",
+        messagingSenderId: "210676880201",
+        appId: "1:210676880201:web:5b0ae4caf7e746c11c0098",
+        measurementId: "G-JK161H00QY"
+    });
+
+    var ui = new firebaseui.auth.AuthUI(firebase.auth());
+    ui.start('#firebaseui-auth-container', {
+        signInOptions: [
+            firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+        ],
+        signInFlow: 'popup',
+        callbacks: {
+            signInSuccessWithAuthResult: function (authResult) {
+                thatFirebase.accessToken = authResult.user.auth.currentUser.accessToken;
+                return false;
+            },
+            signInFailure: function (error) {
+                console.log(error);
+            }
+        },
+    });
+</script>
+
+<link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css" />
+
+<div x-data="{accessToken: ''}" x-init="thatFirebase = $data; watchFirebase()">
+    <hr />
+
+    <div id="firebaseui-auth-container"></div>
+
+    <form id="firebase-form" method="post" action="~/sign-in/firebase" hidden>
+        <input name="accessToken" readonly x-model="accessToken" />
+    </form>
+</div>

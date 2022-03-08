@@ -2,6 +2,7 @@
 using Facilis.UsersManagement.Abstractions;
 using Facilis.UsersManagement.Helpers;
 using Facilis.UsersManagement.SampleApp.Enums;
+using Facilis.UsersManagement.SampleApp.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -96,6 +97,29 @@ namespace Facilis.UsersManagement.SampleApp.Controllers
                 });
 
             return await GetActionResultAsync(username, authenticated);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("~/sign-in/firebase")]
+        public async Task<IActionResult> SignInWithFirebase(
+            [FromServices] FirebaseAuthService firebaseAuthService,
+            string accessToken
+        )
+        {
+            try
+            {
+                var authenticated = await firebaseAuthService.SignIn(accessToken);
+
+                return await this.GetActionResultAsync(
+                    authenticated.User?.Username,
+                    authenticated
+                );
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
 
         [Route("~/sign-out")]

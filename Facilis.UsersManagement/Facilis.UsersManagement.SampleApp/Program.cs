@@ -6,6 +6,8 @@ using Facilis.UsersManagement.Helpers;
 using Facilis.UsersManagement.SampleApp;
 using Facilis.UsersManagement.SampleApp.Helpers;
 using Facilis.UsersManagement.SampleApp.Services;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -33,6 +35,7 @@ static void ConfigureService(WebApplicationBuilder builder)
 
         .AddPasswordBased<PasswordBasedAuthenticator<User>, User>()
         .AddTokenBased<TokenBasedAuthenticator<UserToken, User>, User>()
+        .AddUserIdBased<UserIdBasedAuthenticator<User>, User>()
 
         .AddScoped<IEntityStampsBinder>(provider => new EntityStampsBinder()
         {
@@ -48,7 +51,8 @@ static void ConfigureService(WebApplicationBuilder builder)
         .AddDbContext<DbContext, AppDbContext>()
         .AddDefaultEntities()
 
-        .AddScoped<UserOtpService>();
+        .AddScoped<UserOtpService>()
+        .AddScoped<FirebaseAuthService>();
 }
 
 static void Configure(WebApplication app)
@@ -91,6 +95,11 @@ static void Configure(WebApplication app)
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigureService(builder);
+
+FirebaseApp.Create(new AppOptions()
+{
+    Credential = GoogleCredential.GetApplicationDefault(),
+});
 
 using var app = builder.Build();
 Configure(app);
