@@ -69,6 +69,22 @@ namespace Facilis.UsersManagement.Abstractions
         public string PasswordSalt { get; set; }
         public int PasswordIterated { get; set; }
 
+        #region Constructor(s)
+
+        public User()
+        {
+        }
+
+        public User(IPassword password)
+        {
+            this.HashingMethod = password.HashingMethod;
+            this.HashedPassword = password.HashedPassword;
+            this.PasswordSalt = password.PasswordSalt;
+            this.PasswordIterated = password.PasswordIterated;
+        }
+
+        #endregion Constructor(s)
+
         public T GetProfile()
         {
             return this.serializedProfile == null ? default :
@@ -88,5 +104,16 @@ namespace Facilis.UsersManagement.Abstractions
 
     public class User : User<UserProfile>
     {
+        #region Constructor(s)
+
+        public User() : base()
+        {
+        }
+
+        public User(IPassword password) : base(password)
+        {
+        }
+
+        #endregion Constructor(s)
     }
 }
