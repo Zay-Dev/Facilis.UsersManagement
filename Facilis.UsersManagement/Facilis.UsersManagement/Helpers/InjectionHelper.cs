@@ -27,6 +27,15 @@ namespace Facilis.UsersManagement.Helpers
             return services.AddAuthenticator<ITokenBase, TAuthenticator, TUser>();
         }
 
+        public static IServiceCollection AddUserIdBased<TAuthenticator, TUser>(
+            this IServiceCollection services
+        )
+            where TUser : IUser
+            where TAuthenticator : class, IAuthenticator<IUserIdBase, TUser>
+        {
+            return services.AddAuthenticator<IUserIdBase, TAuthenticator, TUser>();
+        }
+
         public static IServiceCollection AddDefaultPasswordHasher(
             this IServiceCollection services
         )
