@@ -4,6 +4,7 @@
 <script type="text/javascript">
     const watchFirebase = () => {
         thatFirebase.$watch('accessToken', () => {
+            cssLoader.show();
             document.getElementById('firebase-form').submit();
         });
     };
