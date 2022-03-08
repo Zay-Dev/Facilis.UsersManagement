@@ -35,6 +35,7 @@ static void ConfigureService(WebApplicationBuilder builder)
 
         .AddPasswordBased<PasswordBasedAuthenticator<User>, User>()
         .AddTokenBased<TokenBasedAuthenticator<UserToken, User>, User>()
+        .AddUserIdBased<UserIdBasedAuthenticator<User>, User>()
 
         .AddScoped<IEntityStampsBinder>(provider => new EntityStampsBinder()
         {
@@ -50,7 +51,8 @@ static void ConfigureService(WebApplicationBuilder builder)
         .AddDbContext<DbContext, AppDbContext>()
         .AddDefaultEntities()
 
-        .AddScoped<UserOtpService>();
+        .AddScoped<UserOtpService>()
+        .AddScoped<FirebaseAuthService>();
 }
 
 static void Configure(WebApplication app)
