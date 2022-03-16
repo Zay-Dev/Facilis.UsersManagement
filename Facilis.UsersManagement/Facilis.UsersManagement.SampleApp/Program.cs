@@ -31,6 +31,7 @@ static void ConfigureService(WebApplicationBuilder builder)
         .AddHttpContextAccessor()
         .AddDefaultPasswordHasher()
         .AddDefaultAuthenticationHistories()
+        .AddSingleton<IScopeBuilder, ScopeBuilder>()
         .AddDefaultProfileAttributesBinder()
 
         .AddPasswordBased<PasswordBasedAuthenticator<User>, User>()
