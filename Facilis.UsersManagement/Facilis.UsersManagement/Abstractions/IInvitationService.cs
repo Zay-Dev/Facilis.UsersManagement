@@ -2,21 +2,21 @@
 
 namespace Facilis.UsersManagement.Abstractions
 {
-    public interface IInvitations
+    public interface IInvitationService
     {
         void Accept(string id);
 
         void Send(string from, string to, string type);
     }
 
-    public class Invitations : IInvitations
+    public class InvitationService : IInvitationService
     {
         private IEntitiesWithId<Invitation> invitations { get; }
         private IEntityStampsBinder stampsBinder { get; }
 
         #region Constructor(s)
 
-        public Invitations(
+        public InvitationService(
             IEntitiesWithId<Invitation> invitations,
             IEntityStampsBinder stampsBinder
         )
