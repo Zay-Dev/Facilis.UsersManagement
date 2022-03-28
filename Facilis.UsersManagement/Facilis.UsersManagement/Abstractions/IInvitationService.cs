@@ -14,7 +14,7 @@ namespace Facilis.UsersManagement.Abstractions
 
         void Accept(string id);
 
-        void Send(string from, string to, string type);
+        void Send(string from, string to, string type, bool isAutoAccept = false);
     }
 
     public class InvitationService : IInvitationService
@@ -50,7 +50,7 @@ namespace Facilis.UsersManagement.Abstractions
             this.InvitationAccepted(this, invitation);
         }
 
-        public void Send(string from, string to, string type)
+        public void Send(string from, string to, string type, bool isAutoAccept = false)
         {
             var invitation = new Invitation()
             {
@@ -63,6 +63,7 @@ namespace Facilis.UsersManagement.Abstractions
             this.invitations.Add(invitation);
 
             this.InvitationSent(this, invitation);
+            if (isAutoAccept) this.Accept(invitation.Id);
         }
     }
 }
