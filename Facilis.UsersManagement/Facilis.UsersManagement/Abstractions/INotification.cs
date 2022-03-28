@@ -3,25 +3,25 @@ using System;
 
 namespace Facilis.UsersManagement.Abstractions
 {
-    public interface IInvitation :
+    public interface INotification :
         IEntityWithId,
         IUserRelatedEntity,
+        IEntityWithExpiration,
         IEntityWithCreateStamps
     {
-        string InvitationType { get; }
-        string SentBy { get; }
-        bool IsAccepted { get; }
+        string NotificationType { get; }
+        string ReferenceId { get; }
     }
 
-    public class Invitation : IInvitation
+    public class Notification : INotification
     {
-        public string InvitationType { get; set; }
-        public string SentBy { get; set; }
-        public bool IsAccepted { get; set; }
+        public string NotificationType { get; set; }
+        public string ReferenceId { get; set; }
 
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public string UserId { get; set; }
 
+        public DateTime ExpiredAtUtc { get; set; } = DateTime.MaxValue;
         public string CreatedBy { get; set; }
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
     }
