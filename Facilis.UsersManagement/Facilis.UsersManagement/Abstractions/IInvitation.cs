@@ -10,7 +10,7 @@ namespace Facilis.UsersManagement.Abstractions
     {
         string InvitationType { get; }
         string SentBy { get; }
-        bool IsAccepted { get; }
+        bool IsAccepted { get; set; }
     }
 
     public class Invitation : IInvitation

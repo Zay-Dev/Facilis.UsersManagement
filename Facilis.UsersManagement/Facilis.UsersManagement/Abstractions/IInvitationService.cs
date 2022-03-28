@@ -2,8 +2,16 @@
 
 namespace Facilis.UsersManagement.Abstractions
 {
+    public delegate void InvitationSentEventHandler(object sender, IInvitation invitation);
+
+    public delegate void InvitationAcceptedEventHandler(object sender, IInvitation invitation);
+
     public interface IInvitationService
     {
+        event InvitationSentEventHandler InvitationSent;
+
+        event InvitationAcceptedEventHandler InvitationAccepted;
+
         void Accept(string id);
 
         void Send(string from, string to, string type);
@@ -13,6 +21,10 @@ namespace Facilis.UsersManagement.Abstractions
     {
         private IEntitiesWithId<Invitation> invitations { get; }
         private IEntityStampsBinder stampsBinder { get; }
+
+        public event InvitationSentEventHandler InvitationSent;
+
+        public event InvitationAcceptedEventHandler InvitationAccepted;
 
         #region Constructor(s)
 
@@ -29,8 +41,13 @@ namespace Facilis.UsersManagement.Abstractions
 
         public void Accept(string id)
         {
-            this.invitations.FindById(id).IsAccepted = true;
+            var invitation = this.invitations.FindById(id);
+            invitation.IsAccepted = true;
+
+            this.invitations.Update(invitation);
             this.invitations.Save();
+
+            this.InvitationAccepted(this, invitation);
         }
 
         public void Send(string from, string to, string type)
@@ -44,6 +61,8 @@ namespace Facilis.UsersManagement.Abstractions
 
             this.stampsBinder.BindCreatedByUser(invitation);
             this.invitations.Add(invitation);
+
+            this.InvitationSent(this, invitation);
         }
     }
 }
