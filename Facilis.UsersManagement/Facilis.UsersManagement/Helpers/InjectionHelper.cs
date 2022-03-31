@@ -74,6 +74,20 @@ namespace Facilis.UsersManagement.Helpers
             await next();
         }
 
+        public static async Task UseInvitationNotifier(
+            this IServiceProvider provider,
+            Func<Task> next
+        )
+        {
+            var notifier = provider.GetRequiredService<IInvitationNotifier>();
+            var service = provider.GetRequiredService<IInvitationService>();
+
+            service.InvitationSent += (sender, invitation) => notifier.Notify(invitation);
+            service.InvitationAccepted += (sender, invitation) => notifier.Notify(invitation);
+
+            await next();
+        }
+
         private static IServiceCollection AddAuthenticator<TInputService, TAuthenticator, TUser>(
             this IServiceCollection services
         )
